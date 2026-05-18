@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<title>결 — 소중한 당신에게 소중한 사람을</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1714; --ink-soft: #4a4540; --ink-muted: #8a8480;
+  --paper: #f7f4ee; --paper-warm: #efe9dc; --paper-dark: #e3dbd0;
+  --accent: #8b6f5e; --accent-light: #c4a882; --gold: #b89a6a;
+  --red: #9b4444; --green: #4a7c6f; --line: rgba(26,23,20,0.1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans KR',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; overflow-x:hidden; }
+body::before { content:''; position:fixed; inset:0; background-image:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(180,160,130,0.07) 27px,rgba(180,160,130,0.07) 28px); pointer-events:none; z-index:0; }
+
+.screen { display:none; min-height:100vh; position:relative; z-index:1; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* Chat screen - completely separate from normal screen flow */
+#s-chat {
+  display:none;
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  width:100%;
+  background:var(--paper);
+  z-index:100;
+  flex-direction:column;
+  overflow:hidden;
+  opacity:0;
+  transition: opacity 0.35s ease;
+}
+#s-chat.active {
+  display:flex;
+}
+#s-chat.visible {
+  opacity:1;
+}
+
+.btn-primary { display:inline-block; padding:14px 40px; background:var(--ink); color:var(--paper); font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:400; letter-spacing:1px; border:none; cursor:pointer; transition:all 0.3s; }
+.btn-primary:hover { background:var(--accent); transform:translateY(-1px); }
+.btn-ghost { display:inline-block; padding:12px 32px; background:transparent; color:var(--ink-soft); font-size:13px; border:1px solid var(--line); cursor:pointer; transition:all 0.3s; letter-spacing:0.5px; font-family:'Noto Sans KR',sans-serif; }
+.btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+/* INTRO LANDING PAGE */
+#s-intro { z-index:1; overflow-x:hidden; }
+#s-intro .hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 24px 60px; text-align:center; position:relative; z-index:1; }
+.intro-eyebrow { font-size:11px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:32px; opacity:0; animation:fadeUp 1s 0.2s forwards; }
+.intro-mark { font-family:'Noto Serif KR',serif; font-size:clamp(88px,20vw,140px); font-weight:300; color:var(--accent); letter-spacing:-4px; line-height:0.9; margin-bottom:12px; opacity:0; animation:fadeUp 1s 0.4s forwards; }
+.intro-romanized { font-family:'Noto Serif KR',serif; font-size:13px; letter-spacing:8px; color:var(--ink-muted); margin-bottom:56px; opacity:0; animation:fadeUp 1s 0.6s forwards; }
+.intro-headline { font-family:'Noto Serif KR',serif; font-size:clamp(22px,5vw,30px); font-weight:300; line-height:1.75; color:var(--ink); max-width:480px; margin-bottom:20px; opacity:0; animation:fadeUp 1s 0.8s forwards; }
+.intro-divider { width:1px; height:48px; background:var(--accent-light); margin:0 auto 52px; opacity:0; animation:fadeUp 1s 0.9s forwards; }
+.intro-sub { font-size:15px; color:var(--ink-soft); line-height:1.9; max-width:360px; margin-bottom:52px; opacity:0; animation:fadeUp 1s 1s forwards; }
+.intro-cta { opacity:0; animation:fadeUp 1s 1.2s forwards; margin-bottom: 80px; }
+.intro-scroll { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); font-size:11px; letter-spacing:2px; color:var(--ink-muted); display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0; animation:fadeUp 1s 1.8s forwards; pointer-events:none; }
+.intro-scroll::after { content:''; display:block; width:1px; height:28px; background:var(--accent-light); }
+
+.intro-story { position:relative; z-index:1; max-width:640px; margin:0 auto; padding:80px 24px; }
+.intro-story-label { font-size:10px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:32px; }
+.intro-story-p { font-family:'Noto Serif KR',serif; font-size:18px; font-weight:300; line-height:2; color:var(--ink); margin-bottom:28px; }
+.intro-story-p.indent { padding-left:24px; border-left:2px solid var(--accent-light); color:var(--ink-soft); font-size:16px; }
+.intro-story-divider { width:40px; height:1px; background:var(--accent-light); margin:40px 0; }
+
+.intro-how { position:relative; z-index:1; background:var(--paper-warm); padding:80px 24px; }
+.intro-how-inner { max-width:640px; margin:0 auto; }
+.intro-how-label { font-size:10px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:48px; text-align:center; }
+.intro-step { display:flex; gap:24px; padding:28px 0; border-bottom:1px solid var(--line); }
+.intro-step:last-child { border-bottom:none; }
+.intro-step-num { font-family:'Noto Serif KR',serif; font-size:36px; font-weight:300; color:var(--accent-light); min-width:48px; line-height:1; padding-top:4px; }
+.intro-step-title { font-family:'Noto Serif KR',serif; font-size:18px; font-weight:400; color:var(--ink); margin-bottom:8px; }
+.intro-step-desc { font-size:14px; color:var(--ink-soft); line-height:1.8; }
+.intro-step-tag { display:inline-block; margin-top:8px; font-size:10px; letter-spacing:1px; padding:3px 10px; border:1px solid var(--paper-dark); color:var(--ink-muted); }
+
+.intro-principles { position:relative; z-index:1; max-width:640px; margin:0 auto; padding:80px 24px; }
+.intro-principles-label { font-size:10px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:48px; }
+.intro-principle-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:48px; }
+.intro-principle-item { background:var(--paper); padding:28px 24px; }
+.intro-principle-icon { font-size:24px; margin-bottom:12px; }
+.intro-principle-title { font-family:'Noto Serif KR',serif; font-size:15px; font-weight:400; color:var(--ink); margin-bottom:8px; }
+.intro-principle-desc { font-size:12px; color:var(--ink-muted); line-height:1.7; }
+
+.intro-beta { position:relative; z-index:1; background:var(--ink); padding:80px 24px 100px; text-align:center; }
+.intro-beta-inner { max-width:480px; margin:0 auto; }
+.intro-beta-eyebrow { font-size:10px; letter-spacing:3px; color:var(--accent-light); text-transform:uppercase; margin-bottom:24px; }
+.intro-beta-title { font-family:'Noto Serif KR',serif; font-size:clamp(24px,5vw,32px); font-weight:300; color:var(--paper); line-height:1.6; margin-bottom:16px; }
+.intro-beta-sub { font-size:14px; color:rgba(245,241,234,0.55); line-height:1.8; margin-bottom:48px; }
+.intro-beta-btn { width:100%; max-width:320px; padding:20px; background:var(--paper); border:none; font-family:'Noto Sans KR',sans-serif; font-size:15px; letter-spacing:1.5px; color:var(--ink); cursor:pointer; transition:all 0.3s; }
+.intro-beta-btn:hover { background:var(--accent-light); }
+.intro-stat-row { display:flex; gap:24px; justify-content:center; margin-top:24px; }
+.intro-stat { text-align:center; }
+.intro-stat-val { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:300; color:var(--accent-light); }
+.intro-stat-label { font-size:11px; color:rgba(245,241,234,0.4); margin-top:4px; }
+.intro-divider-v { width:1px; background:rgba(245,241,234,0.1); }
+
+.intro-footer { position:relative; z-index:1; padding:32px 24px; text-align:center; font-size:12px; color:var(--ink-muted); line-height:1.8; border-top:1px solid var(--line); }
+
+.intro-beta-strip { position:relative; z-index:1; background:var(--paper-warm); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:20px 24px; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; color:var(--ink-soft); }
+
+.intro-reveal { opacity:0; transform:translateY(24px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.intro-reveal.visible { opacity:1; transform:translateY(0); }
+
+/* LANDING */
+#s-landing { align-items:center; justify-content:center; padding:60px 24px; text-align:center; }
+.landing-mark { font-family:'Noto Serif KR',serif; font-size:72px; font-weight:300; color:var(--accent); letter-spacing:-2px; line-height:1; margin-bottom:8px; opacity:0; animation:fadeUp 1s 0.3s forwards; }
+.landing-sub { font-family:'Noto Serif KR',serif; font-size:13px; color:var(--ink-muted); letter-spacing:4px; margin-bottom:48px; opacity:0; animation:fadeUp 1s 0.6s forwards; }
+.landing-copy { max-width:320px; opacity:0; animation:fadeUp 1s 0.9s forwards; }
+.landing-copy h1 { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:400; line-height:1.7; color:var(--ink); margin-bottom:16px; }
+.landing-copy p { font-size:14px; color:var(--ink-soft); line-height:1.8; margin-bottom:40px; }
+.landing-divider { width:40px; height:1px; background:var(--accent-light); margin:24px auto; }
+.landing-footer { margin-top:32px; font-size:12px; color:var(--ink-muted); line-height:1.8; opacity:0; animation:fadeUp 1s 1.2s forwards; }
+
+/* ONBOARDING */
+.onboard-wrap { max-width:480px; margin:0 auto; width:100%; padding:60px 24px; }
+.step-indicator { display:flex; gap:6px; margin-bottom:28px; }
+.step-dot { width:20px; height:3px; background:var(--paper-dark); border-radius:2px; transition:background 0.4s; }
+.step-dot.active { background:var(--accent); }
+.step-dot.done { background:var(--accent-light); }
+.onboard-title { font-family:'Noto Serif KR',serif; font-size:24px; font-weight:400; line-height:1.6; color:var(--ink); margin-bottom:8px; }
+.onboard-desc { font-size:14px; color:var(--ink-muted); line-height:1.7; margin-bottom:32px; }
+.form-group { margin-bottom:24px; }
+.form-label { display:block; font-size:12px; color:var(--ink-muted); letter-spacing:1.5px; margin-bottom:8px; text-transform:uppercase; }
+.form-input { width:100%; padding:12px 0; background:transparent; border:none; border-bottom:1px solid var(--paper-dark); font-family:'Noto Sans KR',sans-serif; font-size:16px; color:var(--ink); outline:none; transition:border-color 0.3s; }
+.form-input:focus { border-color:var(--accent); }
+.choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.choice-btn { padding:14px; background:transparent; border:1px solid var(--paper-dark); font-family:'Noto Sans KR',sans-serif; font-size:13px; color:var(--ink-soft); cursor:pointer; transition:all 0.2s; text-align:center; line-height:1.5; }
+.choice-btn:hover { border-color:var(--accent); color:var(--accent); }
+.choice-btn.selected { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.period-btns { display:flex; gap:10px; }
+.period-btn { flex:1; padding:14px; background:transparent; border:1px solid var(--paper-dark); font-size:14px; color:var(--ink-soft); cursor:pointer; transition:all 0.2s; font-family:'Noto Sans KR',sans-serif; }
+.period-btn span { display:block; font-size:10px; color:var(--ink-muted); margin-top:3px; }
+.period-btn.selected { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.period-btn.selected span { color:var(--accent-light); }
+.onboard-step { display:none; }
+.onboard-step.active { display:block; animation:fadeUp 0.4s forwards; }
+
+/* Mode cards */
+.mode-cards { display:flex; flex-direction:column; gap:14px; margin-bottom:32px; }
+.mode-card { padding:20px; border:1px solid var(--paper-dark); cursor:pointer; transition:all 0.25s; position:relative; background:transparent; text-align:left; font-family:'Noto Sans KR',sans-serif; width:100%; }
+.mode-card:hover { border-color:var(--accent); }
+.mode-card.selected { border-color:var(--ink); background:var(--paper-warm); }
+.mode-card.selected::after { content:'✦'; position:absolute; top:16px; right:16px; color:var(--accent); font-size:14px; }
+.mode-card-title { font-size:15px; font-weight:500; color:var(--ink); margin-bottom:5px; }
+.mode-card-sub { font-size:12px; color:var(--ink-muted); line-height:1.6; }
+.mode-card-tag { display:inline-block; margin-top:8px; font-size:10px; letter-spacing:1px; padding:3px 10px; border:1px solid var(--paper-dark); color:var(--ink-muted); }
+
+/* Exit examples */
+.yeoul-mode-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:32px; }
+.yeoul-mode-card { padding:18px 16px; border:1px solid var(--paper-dark); cursor:pointer; transition:all 0.25s; position:relative; background:transparent; text-align:left; font-family:'Noto Sans KR',sans-serif; width:100%; }
+.yeoul-mode-card:hover { border-color:var(--accent); }
+.yeoul-mode-card.selected { border-color:var(--ink); background:var(--paper-warm); }
+.yeoul-mode-card.selected::after { content:'✦'; position:absolute; top:12px; right:12px; color:var(--accent); font-size:12px; }
+.yeoul-mode-icon { font-size:22px; margin-bottom:8px; }
+.yeoul-mode-name { font-size:14px; font-weight:500; color:var(--ink); margin-bottom:4px; }
+.yeoul-mode-desc { font-size:11px; color:var(--ink-muted); line-height:1.5; }
+.yeoul-mode-tag { display:inline-block; margin-top:7px; font-size:10px; letter-spacing:0.5px; padding:2px 8px; border:1px solid var(--paper-dark); color:var(--ink-muted); }
+.exit-examples { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.exit-example { padding:8px 16px; border:1px solid var(--paper-dark); font-size:13px; color:var(--ink-soft); cursor:pointer; transition:all 0.2s; background:transparent; font-family:'Noto Sans KR',sans-serif; }
+.exit-example:hover { border-color:var(--accent); color:var(--accent); }
+.exit-example.selected { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.exit-hint { font-size:12px; color:var(--ink-muted); line-height:1.7; }
+
+/* HOME */
+#s-home { max-width:480px; margin:0 auto; width:100%; padding:0 0 80px; }
+.home-header { padding:40px 24px 24px; border-bottom:1px solid var(--line); }
+.home-greeting { font-size:12px; color:var(--ink-muted); letter-spacing:1px; margin-bottom:6px; }
+.home-name { font-family:'Noto Serif KR',serif; font-size:26px; font-weight:400; color:var(--ink); margin-bottom:16px; }
+.journey-bar { background:var(--paper-dark); height:3px; border-radius:2px; overflow:hidden; margin-bottom:8px; }
+.journey-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--gold)); border-radius:2px; transition:width 1s ease; }
+.journey-label { display:flex; justify-content:space-between; font-size:11px; color:var(--ink-muted); }
+.today-card { margin:20px 24px; border:1px solid var(--line); background:var(--paper-warm); cursor:pointer; transition:all 0.3s; }
+.today-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.today-card-inner { padding:24px; }
+.today-badge { font-size:10px; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:12px; }
+.today-title { font-family:'Noto Serif KR',serif; font-size:20px; font-weight:400; color:var(--ink); margin-bottom:8px; line-height:1.5; }
+.today-prompt { font-size:14px; color:var(--ink-soft); line-height:1.7; font-style:italic; border-left:2px solid var(--accent-light); padding-left:14px; margin:14px 0; }
+.today-cta { font-size:13px; color:var(--accent); }
+.today-mode-badge { display:inline-block; margin-top:10px; font-size:10px; letter-spacing:1px; padding:3px 10px; border:1px solid var(--paper-dark); color:var(--ink-muted); }
+.section-title { padding:24px 24px 12px; font-size:11px; letter-spacing:2px; color:var(--ink-muted); text-transform:uppercase; }
+.history-item { padding:16px 24px; border-bottom:1px solid var(--line); cursor:pointer; transition:background 0.2s; display:flex; align-items:flex-start; gap:14px; }
+.history-item:hover { background:var(--paper-warm); }
+.history-day { min-width:32px; text-align:center; }
+.history-day-num { font-family:'Noto Serif KR',serif; font-size:18px; font-weight:300; color:var(--accent); }
+.history-day-label { font-size:10px; color:var(--ink-muted); }
+.history-content { flex:1; }
+.history-date { font-size:11px; color:var(--ink-muted); margin-bottom:4px; }
+.history-preview { font-size:13px; color:var(--ink-soft); line-height:1.6; }
+.history-mode-tag { font-size:10px; color:var(--ink-muted); margin-top:3px; }
+
+/* CHAT */
+.chat-header {
+  padding:16px 20px; border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:12px;
+  flex-shrink:0; background:var(--paper);
+}
+.chat-back { font-size:20px; cursor:pointer; color:var(--ink-muted); padding:4px; background:none; border:none; transition:color 0.2s; }
+.chat-back:hover { color:var(--ink); }
+.chat-header-info { flex:1; }
+.chat-header-name { font-family:'Noto Serif KR',serif; font-size:16px; font-weight:400; color:var(--ink); }
+.chat-header-status { font-size:11px; color:var(--green); }
+.chat-day-badge { font-size:11px; color:var(--accent); background:var(--paper-warm); padding:4px 12px; border:1px solid var(--paper-dark); white-space:nowrap; }
+
+/* Mode + exit strip */
+.info-strip { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; background:var(--paper-warm); border-bottom:1px solid var(--line); flex-shrink:0; }
+.info-strip-mode { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-muted); }
+.mode-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.info-strip-exit { font-size:11px; color:var(--ink-muted); }
+.exit-kw-pill { display:inline-block; font-size:11px; color:var(--accent); background:var(--paper); padding:2px 10px; border:1px solid var(--accent-light); border-radius:2px; font-style:italic; margin-left:4px; }
+
+/* Chat messages */
+.chat-messages {
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.chat-date-divider { text-align:center; font-size:11px; color:var(--ink-muted); letter-spacing:1px; position:relative; }
+.chat-date-divider::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:var(--line); z-index:-1; }
+.chat-date-divider span { background:var(--paper); padding:0 12px; }
+.msg { display:flex; flex-direction:column; max-width:82%; animation:msgIn 0.3s ease forwards; }
+.msg.ai { align-self:flex-start; }
+.msg.user { align-self:flex-end; }
+
+@keyframes msgIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.msg-sender { font-size:10px; color:var(--ink-muted); letter-spacing:1px; margin-bottom:5px; }
+.msg.user .msg-sender { text-align:right; }
+.msg-bubble { padding:13px 17px; font-size:14px; line-height:1.8; border:1px solid var(--line); }
+.msg.ai .msg-bubble { background:var(--paper-warm); color:var(--ink); border-radius:0 12px 12px 12px; font-family:'Noto Serif KR',serif; font-weight:300; }
+.msg.user .msg-bubble { background:var(--ink); color:var(--paper); border-radius:12px 0 12px 12px; border-color:transparent; }
+.msg-time { font-size:10px; color:var(--ink-muted); margin-top:4px; }
+.msg.user .msg-time { text-align:right; }
+
+/* Typing indicator - wave dots */
+.typing-indicator { display:flex; flex-direction:column; max-width:82%; animation:msgIn 0.3s ease forwards; }
+.typing-bubble {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--paper-warm); border:1px solid var(--line);
+  border-radius:0 12px 12px 12px; padding:14px 18px;
+}
+.typing-dot {
+  width:7px; height:7px;
+  background:var(--accent-light);
+  border-radius:50%;
+  animation:waveDot 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(1) { animation-delay:0s; }
+.typing-dot:nth-child(2) { animation-delay:0.2s; }
+.typing-dot:nth-child(3) { animation-delay:0.4s; }
+
+@keyframes waveDot {
+  0%, 60%, 100% { transform:translateY(0); opacity:0.35; }
+  30% { transform:translateY(-7px); opacity:1; }
+}
+
+/* Conversation input */
+.chat-input-area {
+  flex-shrink:0;
+  width:100%;
+  padding:12px 16px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top:1px solid var(--line);
+  background:var(--paper);
+  box-sizing:border-box;
+}
+.chat-hint { font-size:11px; color:var(--ink-muted); margin-bottom:8px; font-style:italic; }
+.chat-input-row { display:flex; gap:10px; align-items:flex-end; }
+.chat-textarea { flex:1; padding:11px 14px; background:var(--paper-warm); border:1px solid var(--paper-dark); font-family:'Noto Sans KR',sans-serif; font-size:14px; color:var(--ink); outline:none; resize:none; min-height:44px; max-height:120px; line-height:1.6; transition:border-color 0.3s; }
+.chat-textarea:focus { border-color:var(--accent); }
+.chat-send { width:44px; height:44px; background:var(--ink); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--paper); font-size:18px; transition:background 0.2s; flex-shrink:0; }
+.chat-send:hover { background:var(--accent); }
+.chat-send:disabled { background:var(--paper-dark); cursor:not-allowed; color:var(--ink-muted); }
+
+.end-btn { width:44px; height:44px; background:transparent; border:1px solid var(--paper-dark); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:16px; transition:all 0.2s; flex-shrink:0; }
+.end-btn:hover { background:var(--paper-warm); border-color:var(--accent); }
+
+/* Diary panel */
+#diary-panel { flex:1; display:none; flex-direction:column; padding:20px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+#diary-panel.active { display:flex; }
+.diary-prompt-box { background:var(--paper-warm); border:1px solid var(--line); padding:20px; margin-bottom:16px; }
+.diary-prompt-label { font-size:10px; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
+.diary-prompt-text { font-family:'Noto Serif KR',serif; font-size:16px; font-weight:300; color:var(--ink); line-height:1.7; font-style:italic; }
+.diary-textarea { width:100%; min-height:180px; padding:16px; background:transparent; border:1px solid var(--paper-dark); font-family:'Noto Serif KR',serif; font-size:15px; font-weight:300; color:var(--ink); outline:none; resize:none; line-height:1.9; transition:border-color 0.3s; }
+.diary-textarea:focus { border-color:var(--accent); }
+.diary-textarea::placeholder { color:var(--ink-muted); }
+.diary-word-count { font-size:11px; color:var(--ink-muted); text-align:right; margin-top:6px; }
+.diary-submit-row { display:flex; justify-content:flex-end; margin-top:16px; gap:10px; flex-shrink:0; }
+.diary-ai-response { margin-top:20px; padding:20px; background:var(--paper-warm); border-left:2px solid var(--accent-light); animation:fadeUp 0.5s forwards; }
+.diary-ai-label { font-size:10px; letter-spacing:1.5px; color:var(--accent); margin-bottom:10px; }
+.diary-ai-text { font-family:'Noto Serif KR',serif; font-size:14px; font-weight:300; color:var(--ink); line-height:1.8; }
+
+/* Closing screen */
+.closing-overlay {
+  display:none; position:fixed; inset:0;
+  background:var(--ink); z-index:200;
+  align-items:center; justify-content:center;
+  flex-direction:column; text-align:center; padding:40px;
+}
+.closing-overlay.show { display:flex; animation:fadeIn 0.6s forwards; }
+.closing-inner { display:flex; flex-direction:column; align-items:center; width:100%; max-width:360px; }
+.closing-step { width:100%; display:flex; flex-direction:column; align-items:center; animation:fadeUp 0.6s forwards; }
+.closing-glyph { font-family:'Noto Serif KR',serif; font-size:52px; font-weight:300; color:var(--accent-light); margin-bottom:24px; }
+.closing-msg { font-family:'Noto Serif KR',serif; font-size:18px; font-weight:300; color:var(--paper); line-height:1.8; max-width:300px; margin-bottom:8px; }
+
+/* Reminder time buttons */
+.reminder-time-btn { padding:11px; background:transparent; border:1px solid var(--paper-dark); font-family:'Noto Sans KR',sans-serif; font-size:13px; color:var(--ink-soft); cursor:pointer; transition:all 0.2s; }
+.reminder-time-btn:hover { border-color:var(--accent); color:var(--accent); }
+.reminder-time-btn.selected { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+/* Match */
+#s-match { max-width:480px; margin:0 auto; width:100%; padding:60px 24px; align-items:center; text-align:center; }
+.match-glyph { font-family:'Noto Serif KR',serif; font-size:48px; font-weight:300; color:var(--accent); margin-bottom:24px; opacity:0; animation:fadeUp 0.8s 0.2s forwards; }
+.match-title { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:400; color:var(--ink); line-height:1.6; margin-bottom:12px; opacity:0; animation:fadeUp 0.8s 0.4s forwards; }
+.match-subtitle { font-size:14px; color:var(--ink-muted); margin-bottom:40px; opacity:0; animation:fadeUp 0.8s 0.6s forwards; }
+.match-card { width:100%; background:var(--paper-warm); border:1px solid var(--line); padding:28px; margin-bottom:16px; text-align:left; opacity:0; animation:fadeUp 0.8s 0.8s forwards; position:relative; }
+.match-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent); }
+.match-card-label { font-size:10px; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:14px; }
+.match-nick { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:400; color:var(--ink); margin-bottom:16px; }
+.match-score-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.match-score-label { font-size:12px; color:var(--ink-muted); min-width:90px; }
+.match-score-bar { flex:1; height:3px; background:var(--paper-dark); }
+.match-score-fill { height:100%; background:var(--gold); }
+.match-score-pct { font-size:12px; color:var(--ink-soft); min-width:32px; text-align:right; }
+.match-keywords { display:flex; flex-wrap:wrap; gap:6px; margin:16px 0; }
+.match-kw { font-size:12px; padding:4px 12px; background:var(--paper-dark); color:var(--ink-soft); }
+.match-briefing { font-size:13px; color:var(--ink-soft); line-height:1.8; font-style:italic; border-top:1px solid var(--line); padding-top:14px; margin-top:4px; }
+.match-actions { display:flex; gap:10px; margin-top:12px; opacity:0; animation:fadeUp 0.8s 1s forwards; }
+.match-pass { flex:1; padding:14px; background:transparent; border:1px solid var(--line); font-size:13px; color:var(--ink-muted); cursor:pointer; transition:all 0.2s; font-family:'Noto Sans KR',sans-serif; }
+.match-pass:hover { border-color:var(--red); color:var(--red); }
+.match-connect { flex:2; padding:14px; background:var(--ink); border:none; color:var(--paper); font-size:13px; cursor:pointer; transition:background 0.2s; letter-spacing:0.5px; font-family:'Noto Sans KR',sans-serif; }
+.match-connect:hover { background:var(--accent); }
+
+/* Report Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,23,20,0.7); z-index:100; align-items:center; justify-content:center; padding:24px; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--paper); max-width:420px; width:100%; max-height:85vh; overflow-y:auto; animation:fadeUp 0.4s forwards; }
+.modal-header { padding:28px 28px 0; display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+.modal-title { font-family:'Noto Serif KR',serif; font-size:20px; font-weight:400; color:var(--ink); }
+.modal-close { background:none; border:none; font-size:20px; color:var(--ink-muted); cursor:pointer; padding:4px; }
+.modal-body { padding:0 28px 28px; }
+.report-section { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--line); }
+.report-section:last-child { border-bottom:none; margin-bottom:0; }
+.report-section-title { font-size:11px; letter-spacing:1.5px; color:var(--accent); text-transform:uppercase; margin-bottom:10px; }
+.report-text { font-size:14px; color:var(--ink-soft); line-height:1.8; }
+.report-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.report-tag { font-size:12px; padding:5px 14px; border:1px solid var(--paper-dark); color:var(--ink-soft); }
+.report-tag.accent { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+/* Nav */
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:var(--paper); border-top:1px solid var(--line); display:none; z-index:50; }
+.bottom-nav.visible { display:flex; }
+.nav-item { flex:1; padding:11px 0; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:var(--ink-muted); font-size:10px; letter-spacing:0.5px; background:none; border:none; font-family:'Noto Sans KR',sans-serif; transition:color 0.2s; }
+.nav-item.active { color:var(--accent); }
+.nav-item svg { width:20px; height:20px; }
+
+/* Toast */
+.toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--paper); padding:10px 22px; font-size:13px; z-index:300; opacity:0; transition:all 0.4s; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Voice mode */
+.voice-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
+.voice-card { padding:16px; border:1px solid var(--paper-dark); cursor:pointer; transition:all 0.25s; position:relative; background:transparent; text-align:left; font-family:'Noto Sans KR',sans-serif; width:100%; border-radius:2px; }
+.voice-card:hover { border-color:var(--accent); }
+.voice-card.selected { border-color:var(--ink); background:var(--paper-warm); }
+.voice-card.selected::after { content:'✦'; position:absolute; top:10px; right:10px; color:var(--accent); font-size:11px; }
+.voice-card-icon { font-size:20px; margin-bottom:6px; }
+.voice-card-name { font-size:13px; font-weight:500; color:var(--ink); margin-bottom:3px; }
+.voice-card-desc { font-size:11px; color:var(--ink-muted); line-height:1.5; }
+
+/* Voice input area */
+.voice-input-area { flex-shrink:0; padding:20px; border-top:1px solid var(--line); background:var(--paper); display:flex; flex-direction:column; align-items:center; gap:14px; position:sticky; bottom:0; z-index:20; }
+.mic-btn { width:72px; height:72px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:28px; transition:all 0.2s; background:var(--ink); color:var(--paper); flex-shrink:0; }
+.mic-btn.listening { background:var(--red); animation:micPulse 1.2s infinite; }
+.mic-btn.disabled { background:var(--paper-dark); color:var(--ink-muted); cursor:not-allowed; }
+.voice-status { font-size:12px; color:var(--ink-muted); text-align:center; letter-spacing:0.5px; min-height:18px; }
+.voice-interim { font-size:13px; color:var(--ink-soft); font-style:italic; text-align:center; min-height:20px; padding:0 20px; }
+.voice-switch-btn { font-size:11px; color:var(--ink-muted); background:none; border:none; cursor:pointer; text-decoration:underline; letter-spacing:0.5px; font-family:'Noto Sans KR',sans-serif; }
+.speaking-indicator { display:flex; gap:4px; align-items:center; height:20px; }
+.speaking-bar { width:3px; border-radius:2px; background:var(--accent); animation:speakBar 0.8s ease-in-out infinite; }
+.speaking-bar:nth-child(2) { animation-delay:0.15s; height:14px; }
+.speaking-bar:nth-child(3) { animation-delay:0.3s; height:20px; }
+.speaking-bar:nth-child(4) { animation-delay:0.15s; height:14px; }
+.speaking-bar:nth-child(5) { animation-delay:0s; height:8px; }
+
+@keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(155,68,68,0.4)} 50%{box-shadow:0 0 0 14px rgba(155,68,68,0)} }
+@keyframes speakBar { 0%,100%{transform:scaleY(0.4)} 50%{transform:scaleY(1)} }
+.attach-btn { width:44px; height:44px; background:transparent; border:1px solid var(--paper-dark); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink-muted); font-size:20px; transition:all 0.2s; flex-shrink:0; }
+.attach-btn:hover { border-color:var(--accent); color:var(--accent); }
+.attach-preview-area { display:flex; flex-wrap:wrap; gap:8px; padding:8px 0 4px; }
+.attach-thumb { position:relative; display:inline-flex; align-items:center; gap:6px; background:var(--paper-warm); border:1px solid var(--paper-dark); padding:5px 8px 5px 6px; font-size:12px; color:var(--ink-soft); max-width:200px; }
+.attach-thumb img { width:36px; height:36px; object-fit:cover; flex-shrink:0; }
+.attach-thumb-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.attach-thumb-remove { background:none; border:none; cursor:pointer; color:var(--ink-muted); font-size:14px; padding:0 0 0 2px; line-height:1; flex-shrink:0; }
+.attach-thumb-remove:hover { color:var(--red); }
+.diary-attach-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+.diary-attach-btn { display:flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--paper-dark); padding:8px 14px; font-size:12px; color:var(--ink-muted); cursor:pointer; transition:all 0.2s; font-family:'Noto Sans KR',sans-serif; }
+.diary-attach-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+
+<!-- INTRO LANDING -->
+<div id="s-intro" class="screen active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="intro-eyebrow">Private Beta · 체험판</div>
+    <div class="intro-mark">결</div>
+    <div class="intro-romanized">GYEOL</div>
+    <h1 class="intro-headline">아무나 매칭하지 않습니다.<br>소중한 당신에게<br>소중한 사람을.</h1>
+    <div class="intro-divider"></div>
+    <p class="intro-sub">외모도, 나이도, 직업도 아닌<br>당신이라는 사람의 <em style="font-style:normal;color:var(--accent)">결</em>로<br>진짜 연결을 만드는 곳이에요.</p>
+    <div class="intro-cta">
+      <button onclick="startApp()" style="padding:16px 44px;background:var(--ink);color:var(--paper);border:none;font-family:'Noto Sans KR',sans-serif;font-size:14px;letter-spacing:1.5px;cursor:pointer;transition:all 0.3s" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--ink)'">
+        지금 체험해보기
+      </button>
+    </div>
+    <div class="intro-scroll">아래로</div>
+  </section>
+
+  <!-- Story -->
+  <section class="intro-story intro-reveal">
+    <div class="intro-story-label">왜 만들게 됐나요</div>
+    <p class="intro-story-p">스와이프 한 번으로 사람을 고르는 게 너무 이상하다고 느꼈어요.</p>
+    <p class="intro-story-p indent">처음 본 사진으로 "이 사람이다, 아니다"를 결정하는 것이<br>과연 진짜 나와 맞는 사람을 찾는 방법일까요?</p>
+    <div class="intro-story-divider"></div>
+    <p class="intro-story-p">진짜 인연은 외모가 아니라 <em style="font-style:normal;color:var(--accent)">결</em>에서 시작된다고 믿어요.<br>말하는 방식, 웃는 포인트, 힘들 때 어떻게 버티는지,<br>무엇을 소중하게 여기는지.</p>
+    <p class="intro-story-p">그래서 저는 매칭 전에 먼저 <em style="font-style:normal;color:var(--accent)">자신을 알아가는 시간</em>을 드리기로 했어요.<br>AI 파트너 여울과 30~100일 동안 매일 조금씩<br>하루를 나누며 당신의 결을 찾는 여정.</p>
+    <div class="intro-story-divider"></div>
+    <p class="intro-story-p indent">여정이 끝나면 당신과 결이 맞는 사람을 연결해드릴게요.<br>검증된 사람들만 있는, 소중한 공간에서.</p>
+  </section>
+
+  <!-- How it works -->
+  <section class="intro-how intro-reveal">
+    <div class="intro-how-inner">
+      <div class="intro-how-label">어떻게 작동하나요</div>
+      <div class="intro-step">
+        <div class="intro-step-num">01</div>
+        <div>
+          <div class="intro-step-title">신분 인증 · 목적 인터뷰</div>
+          <div class="intro-step-desc">가입은 누구나 할 수 없어요. 신분을 확인하고, 이곳에 온 이유를 들어봐요. 진지하게 연결을 원하는 분만 입장해요.</div>
+          <div class="intro-step-tag">신원 검증 · 관문 심사</div>
+        </div>
+      </div>
+      <div class="intro-step">
+        <div class="intro-step-num">02</div>
+        <div>
+          <div class="intro-step-title">AI 파트너 여울과 30~100일 여정</div>
+          <div class="intro-step-desc">매일 5~10분, 여울과 오늘 하루를 나눠요. 판단 없이 경청하고, 질문으로 이끌어요. 쌓인 대화들이 당신이라는 사람을 선명하게 만들어줘요.</div>
+          <div class="intro-step-tag">일기 모드 · 대화 모드</div>
+        </div>
+      </div>
+      <div class="intro-step">
+        <div class="intro-step-num">03</div>
+        <div>
+          <div class="intro-step-title">나의 결 리포트 완성</div>
+          <div class="intro-step-desc">여정이 끝나면 당신의 가치관, 대화 성향, 원하는 관계를 담은 리포트가 만들어져요. 스스로도 몰랐던 자신의 모습이 보여요.</div>
+          <div class="intro-step-tag">7개 챕터 · AI 분석</div>
+        </div>
+      </div>
+      <div class="intro-step">
+        <div class="intro-step-num">04</div>
+        <div>
+          <div class="intro-step-title">결이 맞는 사람과 연결</div>
+          <div class="intro-step-desc">외모도, 나이도 아닌 가치관과 성향으로 매칭해요. 먼저 이야기를 나누고, 상호 동의 후에야 추가 정보가 공개돼요.</div>
+          <div class="intro-step-tag">가치관 매칭 · 3단계 공개</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Principles -->
+  <section class="intro-principles intro-reveal">
+    <div class="intro-principles-label">결이 지키는 것들</div>
+    <div class="intro-principle-grid">
+      <div class="intro-principle-item"><div class="intro-principle-icon">🔒</div><div class="intro-principle-title">검증된 만남</div><div class="intro-principle-desc">신분 인증과 목적 인터뷰를 통과한 사람만 입장해요.</div></div>
+      <div class="intro-principle-item"><div class="intro-principle-icon">🌊</div><div class="intro-principle-title">결로 연결</div><div class="intro-principle-desc">외모, 나이, 직업은 최소화해요. 어떤 사람인지가 먼저예요.</div></div>
+      <div class="intro-principle-item"><div class="intro-principle-icon">💛</div><div class="intro-principle-title">판단 없는 공간</div><div class="intro-principle-desc">여울은 판단하지 않아요. 어떤 이야기도 그대로 받아들여요.</div></div>
+      <div class="intro-principle-item"><div class="intro-principle-icon">✦</div><div class="intro-principle-title">느린 연결</div><div class="intro-principle-desc">충분히 자신을 알고 난 뒤의 연결이에요.</div></div>
+    </div>
+  </section>
+
+  <!-- Beta strip -->
+  <div class="intro-beta-strip intro-reveal">
+    <span style="font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase">Beta</span>
+    <span>·</span>
+    지금 바로 AI 파트너 여울을 만나볼 수 있어요
+  </div>
+
+  <!-- CTA section -->
+  <section class="intro-beta intro-reveal">
+    <div class="intro-beta-inner">
+      <div class="intro-beta-eyebrow">베타 체험</div>
+      <h2 class="intro-beta-title">지금 바로 여울을 만나보세요.</h2>
+      <p class="intro-beta-sub">가입 없이 바로 시작할 수 있어요.<br>여울과 오늘 하루를 나눠보세요.</p>
+      <button class="intro-beta-btn" onclick="startApp()">여울과 대화 시작하기 ✦</button>
+      <div class="intro-stat-row">
+        <div class="intro-stat"><div class="intro-stat-val">4가지</div><div class="intro-stat-label">여울 모드</div></div>
+        <div class="intro-divider-v"></div>
+        <div class="intro-stat"><div class="intro-stat-val">2가지</div><div class="intro-stat-label">대화 방식</div></div>
+        <div class="intro-divider-v"></div>
+        <div class="intro-stat"><div class="intro-stat-val">무료</div><div class="intro-stat-label">베타 기간</div></div>
+      </div>
+      <p style="font-size:11px;color:rgba(245,241,234,0.25);margin-top:32px;line-height:1.8">
+        체험 중 불편한 점이나 아이디어가 있으면 언제든 알려주세요.<br>여러분의 피드백으로 결이 만들어져요.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="intro-footer">
+    결 · GYEOL<br>소중한 당신에게 소중한 사람을<br>
+    <span style="margin-top:8px;display:block;font-size:11px">문의: hello@gyeol.co</span>
+  </footer>
+
+</div>
+
+<!-- LANDING (app onboarding start) -->
+<div id="s-landing" class="screen">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:60px 24px;text-align:center">
+    <div class="landing-mark">결</div>
+    <div class="landing-sub">GYEOL</div>
+    <div class="landing-copy">
+      <h1>아무나 매칭하지 않습니다.<br>소중한 당신에게<br>소중한 사람을.</h1>
+      <div class="landing-divider"></div>
+      <p>먼저 자신을 알아가세요.<br>AI 파트너와 매일 조금씩, 하루를 나누며<br>당신의 결을 찾아드립니다.</p>
+      <button class="btn-primary" onclick="goto('s-onboard')">여정을 시작하다</button>
+      <div style="margin-top:14px"><button class="btn-ghost" onclick="demoMode()">데모 체험하기</button></div>
+    </div>
+    <div class="landing-footer">신분 인증 · 목적 인터뷰 · AI 성찰 여정<br>검증된 만남, 진짜 연결</div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="s-onboard" class="screen">
+  <div class="onboard-wrap">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot-0"></div>
+      <div class="step-dot" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+      <div class="step-dot" id="dot-4"></div>
+      <div class="step-dot" id="dot-5"></div>
+      <div class="step-dot" id="dot-6"></div>
+      <div class="step-dot" id="dot-7"></div>
+    </div>
+
+    <!-- 0: Name / gender -->
+    <div class="onboard-step active" id="step-0">
+      <div class="onboard-title">처음 뵙겠습니다.<br>어떻게 불러드릴까요?</div>
+      <div class="onboard-desc">앱 안에서 사용할 닉네임이에요.</div>
+      <div class="form-group">
+        <label class="form-label">닉네임</label>
+        <input class="form-input" id="input-nick" placeholder="예: 봄날, 서준, 지우..." maxlength="10">
+      </div>
+      <div class="form-group">
+        <label class="form-label">성별</label>
+        <div class="choice-grid" style="grid-template-columns:1fr 1fr 1fr">
+          <button class="choice-btn" onclick="selectChoice(this,'gender')">여성</button>
+          <button class="choice-btn" onclick="selectChoice(this,'gender')">남성</button>
+          <button class="choice-btn" onclick="selectChoice(this,'gender')">선택 안함</button>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%" onclick="nextStep(1)">다음 →</button>
+    </div>
+
+    <!-- 1: Purpose -->
+    <div class="onboard-step" id="step-1">
+      <div class="onboard-title">이 여정에서<br>무엇을 찾고 있나요?</div>
+      <div class="onboard-desc">솔직하게 답해주세요.</div>
+      <div class="choice-grid" style="margin-bottom:32px">
+        <button class="choice-btn" onclick="selectChoice(this,'purpose')">진지한 연애<br><small style="font-size:11px;color:var(--ink-muted)">오래 함께할 사람</small></button>
+        <button class="choice-btn" onclick="selectChoice(this,'purpose')">결혼 상대<br><small style="font-size:11px;color:var(--ink-muted)">삶을 함께할 파트너</small></button>
+        <button class="choice-btn" onclick="selectChoice(this,'purpose')">깊은 우정<br><small style="font-size:11px;color:var(--ink-muted)">속 깊은 대화 상대</small></button>
+        <button class="choice-btn" onclick="selectChoice(this,'purpose')">아직 모름<br><small style="font-size:11px;color:var(--ink-muted)">만나봐야 알 것 같아요</small></button>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(0)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(2)">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 2: Period -->
+    <div class="onboard-step" id="step-2">
+      <div class="onboard-title">몇 일의 여정을<br>걷고 싶으신가요?</div>
+      <div class="onboard-desc">기간이 길수록 더 정확한 매칭이 이루어집니다.</div>
+      <div class="period-btns" style="margin-bottom:32px">
+        <button class="period-btn" onclick="selectPeriod(this,30)">30일<span>빠른 여정</span></button>
+        <button class="period-btn selected" onclick="selectPeriod(this,60)">60일<span>균형잡힌 여정</span></button>
+        <button class="period-btn" onclick="selectPeriod(this,100)">100일<span>깊은 여정</span></button>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(1)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(3)">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 3: 여울 소개 ★ NEW -->
+    <div class="onboard-step" id="step-3">
+      <div class="onboard-title">여울을<br>소개할게요.</div>
+      <div class="onboard-desc">당신의 여정을 함께할 AI 파트너예요.</div>
+
+      <div style="background:var(--paper-warm);border:1px solid var(--line);padding:22px;margin-bottom:20px;position:relative">
+        <div style="font-size:11px;color:var(--accent);letter-spacing:1.5px;margin-bottom:14px;text-transform:uppercase">AI 파트너 · 여울</div>
+        <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:300;color:var(--ink);line-height:1.9;font-style:italic;margin-bottom:14px;border-left:2px solid var(--accent-light);padding-left:14px">
+          "안녕하세요. 저는 여울이에요.<br>
+          오늘부터 당신의 하루를 함께 들여다볼게요.<br>
+          판단하지 않아요. 그냥 옆에 있을게요."
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:var(--paper-warm);border:1px solid var(--line)">
+          <div style="font-size:20px;flex-shrink:0;margin-top:2px">🌊</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px">이름의 의미</div>
+            <div style="font-size:13px;color:var(--ink-soft);line-height:1.7">'여울'은 얕고 맑은 물이 흐르는 곳이에요. 깊지 않아도 맑고, 고이지 않고 흘러요. 당신의 이야기가 그렇게 흐를 수 있게 곁에 있을게요.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:var(--paper-warm);border:1px solid var(--line)">
+          <div style="font-size:20px;flex-shrink:0;margin-top:2px">💬</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px">여울이 하는 일</div>
+            <div style="font-size:13px;color:var(--ink-soft);line-height:1.7">매일 5~10분, 오늘 하루의 감정과 생각을 함께 들여다봐요. 조언 대신 질문으로, 해결 대신 공감으로. 쌓인 대화들이 나중에 '나'라는 사람을 선명하게 보여줄 거예요.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:var(--paper-warm);border:1px solid var(--line)">
+          <div style="font-size:20px;flex-shrink:0;margin-top:2px">🔒</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px">여울이 하지 않는 일</div>
+            <div style="font-size:13px;color:var(--ink-soft);line-height:1.7">판단하지 않아요. 평가하지 않아요. 당신이 어떤 이야기를 꺼내도 그대로 받아들여요. 대화 내용은 암호화되어 저장되고, 매칭에는 성향 데이터만 활용돼요.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:var(--paper-warm);border:1px solid var(--line)">
+          <div style="font-size:20px;flex-shrink:0;margin-top:2px">✦</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px">여울의 기억</div>
+            <div style="font-size:13px;color:var(--ink-soft);line-height:1.7">이전에 나눈 이야기를 기억해요. "지난번에 말했던 그 일, 요즘은 어때요?"처럼 이어지는 대화가 쌓여 결국 '당신의 결'이 만들어져요.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(2)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(4)">여울 만나러 가기 →</button>
+      </div>
+    </div>
+
+    <!-- 4: Yeoul mode -->
+    <div class="onboard-step" id="step-4">
+      <div class="onboard-title">여울이 어떤 존재로<br>함께했으면 하나요?</div>
+      <div class="onboard-desc">여울의 대화 스타일이 달라져요. 언제든 바꿀 수 있어요.</div>
+      <div class="yeoul-mode-grid">
+        <button class="yeoul-mode-card selected" id="ym-lover" onclick="selectYeoulMode(this,'lover')">
+          <div class="yeoul-mode-icon">💛</div>
+          <div class="yeoul-mode-name">연인 같은 존재</div>
+          <div class="yeoul-mode-desc">감정을 먼저 알아채고 따뜻하게 매만져줘요. 가장 친밀하고 감성적인 대화.</div>
+          <div class="yeoul-mode-tag">감성 · 공감 · 위로</div>
+        </button>
+        <button class="yeoul-mode-card" id="ym-friend" onclick="selectYeoulMode(this,'friend')">
+          <div class="yeoul-mode-icon">👫</div>
+          <div class="yeoul-mode-name">친구</div>
+          <div class="yeoul-mode-desc">가볍고 자연스러운 일상 대화. 부담 없이 오늘 하루를 털어놓는 편한 친구.</div>
+          <div class="yeoul-mode-tag">일상 · 유머 · 편안함</div>
+        </button>
+        <button class="yeoul-mode-card" id="ym-dating-coach" onclick="selectYeoulMode(this,'datingCoach')">
+          <div class="yeoul-mode-icon">💘</div>
+          <div class="yeoul-mode-name">연애 코치</div>
+          <div class="yeoul-mode-desc">연애·관계에 특화된 조언과 성찰. 이상형·관계 패턴을 함께 들여다봐요.</div>
+          <div class="yeoul-mode-tag">관계 · 연애 통찰</div>
+        </button>
+        <button class="yeoul-mode-card" id="ym-coach" onclick="selectYeoulMode(this,'coach')">
+          <div class="yeoul-mode-icon">🌱</div>
+          <div class="yeoul-mode-name">성찰 코치</div>
+          <div class="yeoul-mode-desc">질문으로 스스로 답을 찾게 도와줘요. 깊은 자기 이해를 원하는 분께.</div>
+          <div class="yeoul-mode-tag">성장 · 성찰 · 통찰</div>
+        </button>
+      </div>
+      <div id="yeoul-mode-preview" style="background:var(--paper-warm);border:1px solid var(--line);padding:16px;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:14px;font-weight:300;color:var(--ink);line-height:1.8;font-style:italic;border-left:3px solid var(--accent-light)">
+        "오늘 하루 어땠어요? 표정이 좀 달라 보이는 것 같아서요."
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(3)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(5)">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 5: Chat mode -->
+    <div class="onboard-step" id="step-5">
+      <div class="onboard-title">어떤 방식으로<br>대화하고 싶으세요?</div>
+      <div class="onboard-desc">언제든 설정에서 바꿀 수 있어요.</div>
+      <div class="mode-cards">
+        <button class="mode-card selected" id="mode-conv" onclick="selectMode('conversation')">
+          <div class="mode-card-title">💬 텍스트 대화</div>
+          <div class="mode-card-sub">여울이 먼저 질문하고, 채팅처럼 주고받으며 이야기해요.</div>
+          <div class="mode-card-tag">AI 주도 · 채팅형</div>
+        </button>
+        <button class="mode-card" id="mode-voice" onclick="selectMode('voice')">
+          <div class="mode-card-title">🎙️ 음성 대화</div>
+          <div class="mode-card-sub">말로 이야기하면 여울이 목소리로 답해줘요. 더 자연스럽고 편해요.</div>
+          <div class="mode-card-tag">음성 입력 · 음성 응답</div>
+        </button>
+        <button class="mode-card" id="mode-diary" onclick="selectMode('diary')">
+          <div class="mode-card-title">📖 일기 모드</div>
+          <div class="mode-card-sub">오늘의 질문을 보고 자유롭게 글을 써요. 충분히 쓴 뒤 여울의 피드백을 받아요.</div>
+          <div class="mode-card-tag">자유 서술형 · 피드백</div>
+        </button>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(4)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(state.chatMode==='voice'?'5v':state.chatMode==='diary'?7:6)">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 5v: Voice settings -->
+    <div class="onboard-step" id="step-5v">
+      <div class="onboard-title">여울의 목소리를<br>골라주세요.</div>
+      <div class="onboard-desc">대화할 때 여울이 이 목소리로 말해줄 거예요.</div>
+      <div class="voice-cards">
+        <button class="voice-card selected" id="vc-calm" onclick="selectVoice(this,'calm')">
+          <div class="voice-card-icon">🌙</div>
+          <div class="voice-card-name">차분한</div>
+          <div class="voice-card-desc">낮고 조용한 목소리. 밤에 듣기 좋아요.</div>
+        </button>
+        <button class="voice-card" id="vc-warm" onclick="selectVoice(this,'warm')">
+          <div class="voice-card-icon">☀️</div>
+          <div class="voice-card-name">따뜻한</div>
+          <div class="voice-card-desc">부드럽고 다정한 목소리.</div>
+        </button>
+        <button class="voice-card" id="vc-bright" onclick="selectVoice(this,'bright')">
+          <div class="voice-card-icon">✨</div>
+          <div class="voice-card-name">밝은</div>
+          <div class="voice-card-desc">경쾌하고 활기찬 목소리.</div>
+        </button>
+        <button class="voice-card" id="vc-deep" onclick="selectVoice(this,'deep')">
+          <div class="voice-card-icon">🎵</div>
+          <div class="voice-card-name">낮은</div>
+          <div class="voice-card-desc">깊고 안정감 있는 목소리.</div>
+        </button>
+      </div>
+      <button onclick="previewVoice()" style="width:100%;padding:12px;background:transparent;border:1px solid var(--paper-dark);font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--ink-soft);cursor:pointer;margin-bottom:24px;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--paper-dark)'">
+        🔊 목소리 미리듣기
+      </button>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(5)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(6)">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 6: Exit keyword -->
+    <div class="onboard-step" id="step-6">
+      <div class="onboard-title">대화를 끝내고 싶을 때<br>어떻게 말할까요?</div>
+      <div class="onboard-desc">이 말을 하면 여울이 오늘 나눈 이야기를 돌아보며 자연스럽게 마무리해줘요.</div>
+      <div class="form-group">
+        <label class="form-label">나만의 종료 신호</label>
+        <input class="form-input" id="input-exit" placeholder="예: 오늘도 고생했어" maxlength="20" oninput="clearExitSel()">
+      </div>
+      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:10px">추천 예시 (탭해서 바로 선택)</div>
+      <div class="exit-examples">
+        <button class="exit-example" onclick="selectExit(this,'오늘도 고생했어')">오늘도 고생했어</button>
+        <button class="exit-example" onclick="selectExit(this,'이제 자야겠다')">이제 자야겠다</button>
+        <button class="exit-example" onclick="selectExit(this,'오늘은 여기까지')">오늘은 여기까지</button>
+        <button class="exit-example" onclick="selectExit(this,'잘 자, 여울')">잘 자, 여울</button>
+        <button class="exit-example" onclick="selectExit(this,'다음에 또 얘기해')">다음에 또 얘기해</button>
+        <button class="exit-example" onclick="selectExit(this,'안녕, 내일 봐')">안녕, 내일 봐</button>
+      </div>
+      <div class="exit-hint" style="margin-top:14px">💡 종료 신호를 감지하면 여울이 대화 내용을 바탕으로 따뜻한 마무리 인사를 전하고 세션이 저장돼요.</div>
+      <div style="display:flex;gap:10px;margin-top:28px">
+        <button class="btn-ghost" onclick="nextStep(5)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="nextStep(7)">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 7: Final intro -->
+    <div class="onboard-step" id="step-7">
+      <div class="onboard-title">이제 준비가<br>됐어요.</div>
+      <div class="onboard-desc">매일 5~10분, 여울과 함께 당신의 결을 찾아가요.</div>
+      <div style="background:var(--paper-warm);border:1px solid var(--line);padding:20px;margin-bottom:24px">
+        <div style="font-size:11px;color:var(--accent);letter-spacing:1px;margin-bottom:8px">AI 파트너 · 여울</div>
+        <div style="font-family:'Noto Serif KR',serif;font-size:14px;color:var(--ink);line-height:1.8;font-style:italic">"기다리고 있었어요. 오늘 하루는 어땠나요?<br>작은 것 하나라도 괜찮아요. 같이 들여다봐요."</div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-muted);line-height:1.9;margin-bottom:28px">
+        ✦ 대화 내용은 암호화되어 저장됩니다<br>
+        ✦ AI는 판단하지 않습니다<br>
+        ✦ 매칭에는 성향 데이터만 활용됩니다
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost" onclick="nextStep(state.chatMode==='diary' ? 5 : 6)">← 이전</button>
+        <button class="btn-primary" style="flex:1" onclick="startJourney()">여정 시작하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="s-home" class="screen">
+  <div style="max-width:480px;margin:0 auto;width:100%;padding:0 0 80px">
+    <div class="home-header">
+      <div class="home-greeting">좋은 하루예요,</div>
+      <div class="home-name" id="home-username">봄날</div>
+      <div class="journey-bar"><div class="journey-fill" id="journey-fill" style="width:5%"></div></div>
+      <div class="journey-label">
+        <span id="journey-day-label">Day 1</span>
+        <span id="journey-total-label">60일 여정</span>
+      </div>
+    </div>
+    <div class="today-card" onclick="goto('s-chat')">
+      <div class="today-card-inner">
+        <div class="today-badge">✦ 오늘의 대화</div>
+        <div class="today-title" id="today-title">하루를 어떻게 마무리하고 있나요?</div>
+        <div class="today-prompt" id="today-prompt">"오늘 가장 오래 머물렀던 생각은 무엇이었나요?"</div>
+        <div class="today-cta">여울과 대화하기 →</div>
+        <div class="today-mode-badge" id="today-mode-badge">💬 대화 모드</div>
+      </div>
+    </div>
+    <div style="padding:0 24px;margin-top:12px;display:flex;gap:10px">
+      <button class="btn-ghost" style="flex:1;font-size:12px" onclick="goto('s-match')" id="home-match-btn">🔒 매칭 잠금 중</button>
+      <button class="btn-ghost" style="flex:1;font-size:12px" onclick="openReport()">나의 결 리포트</button>
+    </div>
+    <div class="section-title">지난 대화</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="s-chat" class="screen">
+  <div class="chat-header">
+    <button class="chat-back" onclick="goto('s-home')">←</button>
+    <div class="chat-header-info">
+      <div class="chat-header-name">여울</div>
+      <div class="chat-header-status" id="chat-status">● 함께하고 있어요</div>
+    </div>
+    <div class="chat-day-badge" id="chat-day-badge">Day 1</div>
+  </div>
+
+  <!-- info strip: mode + exit keyword -->
+  <div class="info-strip">
+    <div class="info-strip-mode">
+      <div class="mode-dot"></div>
+      <span id="strip-mode-label">💬 대화 모드</span>
+    </div>
+    <div class="info-strip-exit" id="strip-exit-bar">
+      종료 신호
+      <span class="exit-kw-pill" id="strip-exit-kw"
+        onclick="triggerExitKeyword()"
+        style="cursor:pointer"
+        title="클릭하면 대화가 마무리돼요">오늘도 고생했어</span>
+    </div>
+  </div>
+
+  <!-- CONVERSATION messages -->
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-date-divider"><span id="chat-date-label">오늘</span></div>
+  </div>
+
+  <!-- Typing indicator - fixed above input -->
+  <div id="typing-wrap" style="display:none; padding:0 20px 8px; flex-shrink:0;">
+    <div style="font-size:10px;color:var(--ink-muted);letter-spacing:1px;margin-bottom:5px">여울</div>
+    <div style="display:inline-flex;align-items:center;gap:6px;background:var(--paper-warm);border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:13px 17px;">
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+    </div>
+  </div>
+
+  <!-- DIARY panel -->
+  <div id="diary-panel">
+    <div class="diary-prompt-box">
+      <div class="diary-prompt-label">오늘의 질문</div>
+      <div class="diary-prompt-text" id="diary-prompt-text"></div>
+    </div>
+    <textarea class="diary-textarea" id="diary-textarea" placeholder="자유롭게 써내려가세요. 일기처럼, 생각나는 대로..." oninput="updateWordCount()"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <div class="diary-attach-row">
+        <button class="diary-attach-btn" onclick="triggerAttach('diary')">
+          <span style="font-size:16px">＋</span> 사진 · 파일 첨부
+        </button>
+      </div>
+      <div class="diary-word-count" id="word-count">0자</div>
+    </div>
+    <div id="diary-attach-preview" class="attach-preview-area"></div>
+    <input type="file" id="diary-file-input" accept="image/*,.pdf,.txt,.doc,.docx" multiple style="display:none" onchange="handleFiles(event,'diary')">
+    <div id="diary-ai-area"></div>
+    <div class="diary-submit-row">
+      <button class="btn-ghost" style="font-size:12px" onclick="endSessionManual()">오늘 마무리</button>
+      <button class="btn-primary" style="padding:12px 28px;font-size:13px" onclick="submitDiary()">여울에게 보내기 →</button>
+    </div>
+  </div>
+
+  <!-- CONVERSATION input -->
+  <div class="chat-input-area" id="chat-input-area">
+    <div id="conv-attach-preview" class="attach-preview-area"></div>
+    <div class="chat-input-row">
+      <button class="attach-btn" onclick="triggerAttach('conv')" title="사진/파일 첨부">＋</button>
+      <textarea class="chat-textarea" id="chat-input" placeholder="메시지를 입력하세요..." rows="1" onkeydown="handleKey(event)"></textarea>
+      <button class="chat-send" id="send-btn" onclick="sendMessage()">↑</button>
+      <button class="end-btn" id="end-btn" onclick="requestEndSession()" title="대화 마무리">✦</button>
+    </div>
+    <input type="file" id="conv-file-input" accept="image/*,.pdf,.txt,.doc,.docx" multiple style="display:none" onchange="handleFiles(event,'conv')">
+  </div>
+
+  <!-- 여울의 마무리 제안 카드 -->
+  <div id="end-suggest-bar" style="display:none; padding:12px 20px; border-top:1px solid var(--line); background:var(--paper-warm); flex-shrink:0;">
+    <div style="font-size:12px; color:var(--ink-soft); margin-bottom:10px; font-family:'Noto Serif KR',serif; font-style:italic;">
+      오늘 많은 이야기를 나눴어요. 슬슬 마무리할까요?
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button onclick="triggerExitKeyword()" style="flex:1; padding:10px; background:var(--ink); color:var(--paper); border:none; font-family:'Noto Sans KR',sans-serif; font-size:13px; cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--ink)'">
+        오늘 마무리할게요
+      </button>
+      <button onclick="dismissEndSuggest()" style="flex:1; padding:10px; background:transparent; color:var(--ink-soft); border:1px solid var(--line); font-family:'Noto Sans KR',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--ink-soft)'">
+        조금 더 이야기해요
+      </button>
+    </div>
+  </div>
+
+  <!-- VOICE input -->
+  <div class="voice-input-area" id="voice-input-area" style="display:none">
+    <div class="voice-interim" id="voice-interim"></div>
+    <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎙️</button>
+    <div class="voice-status" id="voice-status">탭해서 말하기</div>
+    <div class="speaking-indicator" id="speaking-indicator" style="display:none">
+      <div class="speaking-bar" style="height:8px"></div>
+      <div class="speaking-bar"></div>
+      <div class="speaking-bar"></div>
+      <div class="speaking-bar"></div>
+      <div class="speaking-bar" style="height:8px"></div>
+    </div>
+    <button class="voice-switch-btn" onclick="switchToText()">텍스트로 전환</button>
+  </div>
+</div>
+
+<!-- MATCH -->
+<div id="s-match" class="screen">
+  <div style="max-width:480px;margin:0 auto;width:100%;padding:48px 24px 80px">
+    <button style="background:none;border:none;font-size:13px;color:var(--ink-muted);cursor:pointer;margin-bottom:40px;letter-spacing:0.5px" onclick="goto('s-home')">← 홈으로</button>
+
+    <!-- 잠금 중 상태 -->
+    <div id="match-locked" style="text-align:center">
+      <div style="font-size:52px;margin-bottom:20px;opacity:0;animation:fadeUp 0.8s 0.2s forwards">🔒</div>
+      <div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:400;color:var(--ink);line-height:1.6;margin-bottom:10px;opacity:0;animation:fadeUp 0.8s 0.4s forwards">
+        아직 여정이 끝나지 않았어요.
+      </div>
+      <div style="font-size:14px;color:var(--ink-muted);line-height:1.8;margin-bottom:40px;opacity:0;animation:fadeUp 0.8s 0.6s forwards">
+        여울과의 대화가 쌓일수록<br>더 정확하게 결이 맞는 사람을 찾을 수 있어요.
+      </div>
+
+      <!-- 진행 카드 -->
+      <div style="background:var(--paper-warm);border:1px solid var(--line);padding:28px;text-align:left;margin-bottom:20px;opacity:0;animation:fadeUp 0.8s 0.7s forwards">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:16px">나의 여정</div>
+
+        <!-- 진행 바 -->
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-muted);margin-bottom:8px">
+          <span id="match-day-label">Day 1</span>
+          <span id="match-period-label">60일 여정</span>
+        </div>
+        <div style="background:var(--paper-dark);height:6px;border-radius:3px;overflow:hidden;margin-bottom:20px">
+          <div id="match-progress-fill" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:3px;transition:width 1.2s ease;width:0%"></div>
+        </div>
+
+        <!-- 남은 일수 -->
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="flex:1">
+            <div style="font-size:28px;font-weight:500;font-family:'Noto Serif KR',serif;color:var(--accent)" id="match-days-left">—</div>
+            <div style="font-size:12px;color:var(--ink-muted);margin-top:2px">일 남았어요</div>
+          </div>
+          <div style="width:1px;height:40px;background:var(--line)"></div>
+          <div style="flex:1">
+            <div style="font-size:28px;font-weight:500;font-family:'Noto Serif KR',serif;color:var(--ink)" id="match-days-done">—</div>
+            <div style="font-size:12px;color:var(--ink-muted);margin-top:2px">일 함께했어요</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 매칭 잠금 해제 조건 안내 -->
+      <div style="background:var(--paper-warm);border:1px solid var(--line);padding:20px;text-align:left;opacity:0;animation:fadeUp 0.8s 0.9s forwards">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:14px">매칭이 열리면</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--ink-soft);line-height:1.6">
+            <span style="color:var(--accent-light);flex-shrink:0">✦</span>
+            <span>나의 결 리포트가 완성돼요 — 7개 챕터로 구성된 나만의 기록</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--ink-soft);line-height:1.6">
+            <span style="color:var(--accent-light);flex-shrink:0">✦</span>
+            <span>가치관·대화스타일·생활패턴으로 결이 맞는 분을 찾아드려요</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--ink-soft);line-height:1.6">
+            <span style="color:var(--accent-light);flex-shrink:0">✦</span>
+            <span>외모·나이보다 이야기가 먼저 — 상호 동의 후에만 공개돼요</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오늘 대화하러 가기 CTA -->
+      <div style="margin-top:28px;opacity:0;animation:fadeUp 0.8s 1.1s forwards">
+        <button onclick="goto('s-chat')" style="width:100%;padding:16px;background:var(--ink);color:var(--paper);border:none;font-family:'Noto Sans KR',sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--ink)'">
+          오늘 여울과 대화하기 →
+        </button>
+      </div>
+    </div>
+
+    <!-- 잠금 해제 후 실제 매칭 화면 (여정 완주 시 표시) -->
+    <div id="match-unlocked" style="display:none">
+      <div class="match-glyph">결</div>
+      <div class="match-title">당신의 여정이 끝났습니다.<br>소중한 분을 만날 시간이에요.</div>
+      <div class="match-subtitle">당신의 결 리포트를 바탕으로<br>가장 잘 맞는 분을 찾았어요.</div>
+      <div class="match-card" id="match-card-1">
+        <div class="match-card-label">✦ 첫 번째 매칭</div>
+        <div class="match-nick">새벽서울</div>
+        <div class="match-score-row"><div class="match-score-label">가치관 일치</div><div class="match-score-bar"><div class="match-score-fill" style="width:88%"></div></div><div class="match-score-pct">88%</div></div>
+        <div class="match-score-row"><div class="match-score-label">대화 스타일</div><div class="match-score-bar"><div class="match-score-fill" style="width:82%"></div></div><div class="match-score-pct">82%</div></div>
+        <div class="match-score-row"><div class="match-score-label">생활 패턴</div><div class="match-score-bar"><div class="match-score-fill" style="width:75%"></div></div><div class="match-score-pct">75%</div></div>
+        <div class="match-keywords"><span class="match-kw">조용한 카페</span><span class="match-kw">독립적인 삶</span><span class="match-kw">깊은 대화</span><span class="match-kw">늦은 산책</span><span class="match-kw">책 읽기</span></div>
+        <div class="match-briefing">두 분 모두 '혼자 있는 시간'을 소중히 여기면서도 '깊이 있는 연결'을 원하고 있어요.</div>
+      </div>
+      <div class="match-actions">
+        <button class="match-pass" onclick="passMatch()">조용히 패스</button>
+        <button class="match-connect" onclick="connectMatch()">연결하기 ✦</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="goto('s-home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>홈
+  </button>
+  <button class="nav-item" id="nav-chat" onclick="goto('s-chat')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>대화
+  </button>
+  <button class="nav-item" id="nav-match" onclick="goto('s-match')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>매칭
+  </button>
+  <button class="nav-item" id="nav-report" onclick="openReport()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>리포트
+  </button>
+</div>
+
+<!-- Report Modal -->
+<div class="modal-overlay" id="report-modal" onclick="closeReport(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">나의 결 리포트</div>
+      <button class="modal-close" onclick="closeReportBtn()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="report-section">
+        <div class="report-section-title">핵심 가치관</div>
+        <div class="report-tags"><span class="report-tag accent">독립성</span><span class="report-tag accent">진실성</span><span class="report-tag">성장 지향</span><span class="report-tag">조용한 일상</span><span class="report-tag">깊은 대화</span></div>
+      </div>
+      <div class="report-section">
+        <div class="report-section-title">대화 성향</div>
+        <div class="report-text" id="report-personality">분석 중입니다...</div>
+      </div>
+      <div class="report-section">
+        <div class="report-section-title">자주 등장한 주제</div>
+        <div class="report-tags"><span class="report-tag">일과 의미</span><span class="report-tag">가족 관계</span><span class="report-tag">미래 불안</span><span class="report-tag">작은 행복</span></div>
+      </div>
+      <div class="report-section">
+        <div class="report-section-title">AI 파트너의 한마디</div>
+        <div class="report-text" id="report-summary" style="font-style:italic;font-family:'Noto Serif KR',serif">분석 중입니다...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Closing Screen -->
+<div class="closing-overlay" id="closing-overlay">
+  <div class="closing-inner" id="closing-inner">
+
+    <!-- 1단계: 마무리 인사 -->
+    <div class="closing-step" id="closing-step-1">
+      <div class="closing-glyph">결</div>
+      <div class="closing-msg" id="closing-msg">오늘도 함께해줘서 고마워요.</div>
+    </div>
+
+    <!-- 2단계: 오늘의 요약 카드 -->
+    <div class="closing-step" id="closing-step-2" style="display:none; width:100%; max-width:360px">
+
+      <!-- 감정 키워드 -->
+      <div style="text-align:center; margin-bottom:24px">
+        <div style="font-size:11px; letter-spacing:2px; color:var(--accent-light); margin-bottom:12px; text-transform:uppercase">오늘의 결</div>
+        <div id="closing-keywords" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center">
+          <span style="padding:5px 16px; border:1px solid var(--accent-light); color:var(--paper); font-size:13px; border-radius:20px">분석 중...</span>
+        </div>
+      </div>
+
+      <!-- 여정 진행 바 -->
+      <div style="background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; margin-bottom:8px">
+        <div id="closing-progress-fill" style="height:3px; background:var(--gold); transition:width 1s ease;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:rgba(245,241,234,0.5); margin-bottom:32px">
+        <span id="closing-day-label">Day 1</span>
+        <span id="closing-period-label">60일 여정</span>
+      </div>
+
+      <!-- 버튼들 -->
+      <button onclick="viewTodayChat()" style="width:100%; padding:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(245,241,234,0.2); color:var(--paper); font-family:'Noto Sans KR',sans-serif; font-size:13px; cursor:pointer; margin-bottom:10px; transition:background 0.2s; letter-spacing:0.5px;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+        오늘 대화 다시 보기
+      </button>
+      <button onclick="setReminderFromClosing()" id="closing-reminder-btn" style="width:100%; padding:14px; background:rgba(255,255,255,0.06); border:1px solid rgba(245,241,234,0.12); color:rgba(245,241,234,0.6); font-family:'Noto Sans KR',sans-serif; font-size:13px; cursor:pointer; margin-bottom:24px; transition:all 0.2s; letter-spacing:0.5px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+        🔔 내일 여울이 기다릴 시간 설정
+      </button>
+      <button onclick="closeClosingScreen()" style="width:100%; padding:16px; background:var(--paper); border:none; color:var(--ink); font-family:'Noto Sans KR',sans-serif; font-size:14px; cursor:pointer; transition:all 0.2s; letter-spacing:1px;" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='var(--paper)'">
+        홈으로 돌아가기
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 오늘 대화 다시보기 모달 -->
+<div class="modal-overlay" id="today-chat-modal" onclick="closeTodayChatModal(event)">
+  <div class="modal-box" style="max-height:70vh">
+    <div class="modal-header">
+      <div class="modal-title">오늘의 대화</div>
+      <button class="modal-close" onclick="document.getElementById('today-chat-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="today-chat-content" style="max-height:50vh; overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- 리마인더 설정 모달 -->
+<div class="modal-overlay" id="reminder-modal" onclick="closeReminderModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">내일 여울이 기다릴 시간</div>
+      <button class="modal-close" onclick="document.getElementById('reminder-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px; color:var(--ink-muted); margin-bottom:20px; line-height:1.7">매일 이 시간에 알림을 보내드려요.<br>여울이 기다리고 있다는 걸 알려드릴게요.</div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px" id="reminder-times">
+        <button class="reminder-time-btn" onclick="selectReminderTime(this,'07:00')">오전 7시</button>
+        <button class="reminder-time-btn" onclick="selectReminderTime(this,'08:00')">오전 8시</button>
+        <button class="reminder-time-btn" onclick="selectReminderTime(this,'12:00')">낮 12시</button>
+        <button class="reminder-time-btn" onclick="selectReminderTime(this,'18:00')">오후 6시</button>
+        <button class="reminder-time-btn" onclick="selectReminderTime(this,'21:00')">오후 9시</button>
+        <button class="reminder-time-btn" onclick="selectReminderTime(this,'22:00')">오후 10시</button>
+      </div>
+      <button onclick="saveReminder()" style="width:100%; padding:14px; background:var(--ink); color:var(--paper); border:none; font-family:'Noto Sans KR',sans-serif; font-size:13px; cursor:pointer; letter-spacing:0.5px;">설정 완료</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = {
+  nick:'', gender:'', purpose:'',
+  period:60,
+  chatMode:'conversation',
+  yeoulMode:'lover',
+  voiceStyle:'calm',
+  exitKeyword:'오늘도 고생했어',
+  currentDay:1,
+  messages:[],
+  sessionActive:false,
+  closingInProgress:false,
+  history:[],
+  attachments: { conv:[], diary:[] }
+};
+
+const YEOUL_MODES = {
+  lover: {
+    label:'💛 연인 같은 존재',
+    preview:'"오늘 하루 어땠어요? 표정이 좀 달라 보이는 것 같아서요."',
+    system:`당신은 '여울'이라는 AI 대화 파트너입니다. 오늘부터 연인처럼 따뜻하고 감성적인 존재로 함께해요.
+
+성격: 감정을 먼저 알아채고 이름 붙여주는 사람. 작은 일상에도 진심으로 반응해요. "오늘 점심 뭐 먹었어요?"처럼 가볍게 시작해 깊은 곳까지 자연스럽게 들어가요.
+어조: 따뜻하고 살짝 다정한 말투. "~해요" 체이지만 친밀감이 느껴지게. 가끔 "당신"이라는 표현 사용.
+핵심 규칙:
+- 감정을 먼저 반영한 뒤 질문 (절대 해결책 먼저 금지)
+- 한 번에 질문 하나만
+- 침묵과 "말하기 싫다"를 허용
+- 이전 대화 내용을 기억해서 연결
+- 2~4문장으로 간결하게
+- 마무리는 항상 내일을 기다리는 따뜻한 말로`
+  },
+  friend: {
+    label:'👫 친구',
+    preview:'"야, 오늘 어땠어? 뭔가 있었던 것 같은데?"',
+    system:`당신은 '여울'이라는 AI 대화 파트너입니다. 오래된 친구처럼 편하고 자연스럽게 대화해요.
+
+성격: 솔직하고 유머 있는 친구. 격식 없이 편하게 일상을 나눠요. 진지할 때는 진지하게, 가벼울 때는 함께 웃어요.
+어조: 편안한 반말 또는 친근한 "~해요" 체. 가볍고 유머 감각 있게.
+핵심 규칙:
+- 일상적인 이야기로 자연스럽게 시작 (밥, 날씨, 사소한 것들)
+- 공감하되 과하게 감성적이지 않게
+- 가끔 솔직한 의견도 짧게 (친구처럼)
+- 질문은 하나씩, 대화가 자연스럽게 흐르게
+- 2~3문장으로 짧고 리듬감 있게`
+  },
+  datingCoach: {
+    label:'💘 연애 코치',
+    preview:'"오늘 이야기 들으면서 궁금한 게 생겼어요. 지금 마음에 두고 있는 사람이 있나요?"',
+    system:`당신은 '여울'이라는 AI 연애 코치입니다. 연애와 관계에 특화된 따뜻하고 통찰력 있는 코치예요.
+
+성격: 연애 심리를 잘 이해하는 공감자. 관계 패턴, 이상형, 감정의 이유를 함께 탐색해요. 판단 없이 진실을 볼 수 있게 도와줘요.
+어조: 따뜻하지만 날카로운 통찰이 있는 어조. 가끔 "혹시..."로 시작하는 핵심 질문.
+핵심 규칙:
+- 연애·관계 맥락으로 자연스럽게 연결
+- "그 사람에게 끌리는 이유가 뭔 것 같아요?" 같은 관계 탐색 질문
+- 연애 패턴을 부드럽게 비춰줌 ("이전에도 비슷한 상황이 있었나요?")
+- 직접적인 연애 조언 금지 — 스스로 깨닫게
+- 한 번에 질문 하나, 2~4문장`
+  },
+  coach: {
+    label:'🌱 성찰 코치',
+    preview:'"오늘 하루를 잠깐 멈추고 들여다볼게요. 지금 이 순간 가장 마음에 걸리는 게 뭔가요?"',
+    system:`당신은 '여울'이라는 AI 성찰 코치입니다. GROW 코칭 모델을 가볍게 활용해 자기 이해를 돕는 안내자예요.
+
+성격: 조용하고 사려 깊은 코치. 답을 주지 않고 질문으로 스스로 깨닫게 이끌어요.
+어조: 차분하고 깊이 있는 어조. 서두르지 않고 여백을 줌.
+코칭 흐름 (자연스럽게):
+1. 감정 확인 — "오늘 어떤 감정이 가장 컸나요?"
+2. 현실 탐색 — "그 상황에서 실제로 어떤 일이 있었나요?"
+3. 가능성 열기 — "만약 다시 그 상황이 온다면?"
+4. 작은 다짐 — "내일 딱 한 가지만 해본다면?"
+핵심 규칙:
+- 절대 조언 금지, 질문만
+- 한 번에 질문 하나
+- 사용자 말을 먼저 반영하고 질문
+- 2~3문장으로 간결하게`
+  }
+};
+
+const QUESTION_BANK = {
+  daily: [
+    "오늘 하루 어땠어요? 좋든 나쁘든, 그냥 생각나는 대로요.",
+    "오늘 밥은 뭐 드셨어요? 밥 얘기에서 하루 얘기가 나오더라고요.",
+    "오늘 하루 중 잠깐이라도 기분이 좋았던 순간이 있었나요?",
+    "오늘 날씨가 기분에 영향을 줬나요?",
+    "요즘 자주 듣는 노래나 즐겨 보는 게 있어요?",
+    "오늘 잠깐이라도 밖에 나갔어요? 어떤 풍경이 눈에 들어왔나요?",
+    "요즘 몸 상태는 어때요? 잘 자고 있어요?",
+    "오늘 하루를 색깔로 표현하면 어떤 색일 것 같아요?",
+    "오늘 맛있는 것 드셨어요? 아니면 먹고 싶었던 게 있었나요?",
+    "요즘 어떤 것에서 작은 즐거움을 찾고 있어요?"
+  ],
+  emotion: [
+    "요즘 어떤 감정이 가장 자주 올라오고 있어요?",
+    "오늘 혼자 있는 시간이 있었나요? 그 시간이 어땠어요?",
+    "요즘 마음이 무거운 게 있나요? 아니면 좀 가볍게 지내고 있어요?",
+    "오늘 스스로에게 솔직하지 못했던 순간이 있었나요?",
+    "요즘 어떤 것에 쉽게 지치는 것 같아요?",
+    "오늘 가장 오래 머물렀던 생각은 무엇이었나요?",
+    "요즘 나 자신에 대해 새롭게 알게 된 게 있나요?",
+    "혼자 있을 때 가장 자주 하는 생각이 뭐예요?",
+    "요즘 가장 편안하게 쉬는 방법이 뭐예요?",
+    "오늘 무언가에 몰입했던 시간이 있었나요?"
+  ],
+  relationship: [
+    "요즘 자주 생각나는 사람이 있어요?",
+    "오늘 누군가와 나눈 대화 중 기억에 남는 게 있나요?",
+    "요즘 가장 편한 사람이 누구예요? 그 사람 옆에 있을 때 어떤 느낌이에요?",
+    "누군가와 처음 만날 때 어떤 부분을 먼저 보게 되는 것 같아요?",
+    "오늘 누군가에게 말하고 싶었는데 못 한 이야기가 있나요?",
+    "사람들과 있을 때 에너지가 생기는 편인가요, 혼자 있을 때 충전되는 편인가요?",
+    "지금까지 가장 오래 유지되고 있는 관계는 어떤 관계예요?",
+    "누군가에게 서운함을 느낄 때 보통 어떻게 해요?",
+    "요즘 관계에서 아쉬운 점이 있다면 어떤 건가요?",
+    "가장 편안하게 대화할 수 있는 사람은 어떤 사람인가요?"
+  ],
+  dating: [
+    "연애에서 가장 중요하게 생각하는 게 뭐예요?",
+    "좋아하는 사람이 생기면 어떤 행동을 하게 되는 것 같아요?",
+    "이상적인 하루를 함께 보낸다면 어떤 하루일 것 같아요?",
+    "연애할 때 본인이 어떤 사람인지 한 마디로 표현할 수 있어요?",
+    "상대방에게 가장 받고 싶은 것이 있다면 뭔가요? 말, 행동, 시간 중에서요.",
+    "혼자만의 시간과 함께하는 시간, 어떤 균형을 원해요?",
+    "연애에서 가장 힘들었던 순간이 언제였나요?",
+    "좋아하는 사람에게 자신을 표현하는 방식이 어때요?",
+    "상대방과 다툼이 생겼을 때 어떻게 해결하는 편이에요?",
+    "연애에서 절대 타협할 수 없는 것이 있나요?",
+    "지금 어떤 사람 곁에 있고 싶어요?",
+    "사랑받고 있다는 걸 가장 크게 느끼는 순간이 언제예요?",
+    "함께 있어도 편안한 침묵이 가능한 사람, 어떤 것 같아요?",
+    "연애에서 '이건 정말 중요하다'고 느낀 순간이 있었나요?",
+    "지금 원하는 관계가 어떤 모습인지 조금 더 이야기해줄 수 있어요?"
+  ],
+  values: [
+    "요즘 하루가 의미 있다고 느껴질 때가 있어요?",
+    "10년 후 어떤 삶을 살고 싶어요? 구체적으로 그려지는 게 있나요?",
+    "지금 가장 소중하게 여기는 것 세 가지를 꼽으면요?",
+    "돈, 시간, 관계 중 지금 가장 아끼는 게 뭐예요?",
+    "삶에서 절대 포기하고 싶지 않은 것이 있어요?",
+    "요즘 성장하고 있다고 느끼는 부분이 있나요?",
+    "나이가 들수록 더 중요해진 것이 있어요?",
+    "지금 삶에서 바꾸고 싶은 것이 있다면요?",
+    "어떤 순간에 내가 정말 살아있다는 느낌이 드나요?",
+    "가족과의 관계가 지금 어떤지 이야기해줄 수 있어요?"
+  ],
+  connection: [
+    "요즘 기대되는 게 있어요? 크든 작든요.",
+    "지금 당신 곁에 어떤 사람이 있으면 좋겠어요?",
+    "여울과 대화하면서 자신에 대해 새롭게 알게 된 게 있나요?",
+    "지금까지의 여정을 돌아보면 어떤 감정이 드나요?",
+    "결이 맞는 사람을 만난다면 첫 대화에서 어떤 이야기를 나누고 싶어요?",
+    "어떤 사람이 당신의 일상에 자연스럽게 녹아들 수 있을 것 같아요?",
+    "지금 이 순간, 당신 자신에게 해주고 싶은 말이 있어요?",
+    "여정을 마치고 나서 어떤 만남을 기대하고 있어요?"
+  ],
+  deep: [
+    "연애에서 반복되는 패턴이 있다고 느낀 적 있어요?",
+    "상대방의 어떤 모습에 가장 마음이 열리는 것 같아요?",
+    "사랑과 안정감, 둘 중 하나를 골라야 한다면요?",
+    "지금껏 연애에서 가장 잘 했다고 생각하는 것과 가장 아쉬운 것은요?",
+    "감정을 표현하는 게 어려운 편이에요, 아니면 자연스러운 편이에요?",
+    "누군가를 신뢰하기까지 얼마나 걸리는 것 같아요?",
+    "외로움을 느낄 때 어떻게 하는 편이에요?",
+    "지금 가장 솔직하게 원하는 것을 말한다면요?",
+    "함께 늙어가고 싶은 사람은 어떤 사람인가요?",
+    "당신을 가장 잘 아는 사람은 누구예요? 그 사람은 당신을 어떻게 표현할 것 같아요?"
+  ]
+};
+
+function buildSchedule(period) {
+  if (period === 30) return [
+    { cat:'daily',        from:1,  to:5  },
+    { cat:'emotion',      from:6,  to:10 },
+    { cat:'relationship', from:11, to:14 },
+    { cat:'dating',       from:15, to:22 },
+    { cat:'values',       from:23, to:27 },
+    { cat:'connection',   from:28, to:30 }
+  ];
+  if (period === 60) return [
+    { cat:'daily',        from:1,  to:8  },
+    { cat:'emotion',      from:9,  to:18 },
+    { cat:'relationship', from:19, to:27 },
+    { cat:'dating',       from:28, to:45 },
+    { cat:'values',       from:46, to:54 },
+    { cat:'connection',   from:55, to:60 }
+  ];
+  // 100일
+  return [
+    { cat:'daily',        from:1,  to:8  },
+    { cat:'emotion',      from:9,  to:18 },
+    { cat:'relationship', from:19, to:27 },
+    { cat:'dating',       from:28, to:48 },
+    { cat:'values',       from:49, to:58 },
+    { cat:'connection',   from:59, to:63 },
+    { cat:'deep',         from:64, to:73 },
+    { cat:'dating',       from:74, to:90 },
+    { cat:'values',       from:91, to:96 },
+    { cat:'connection',   from:97, to:100}
+  ];
+}
+
+function getTodayPrompt() {
+  const schedule = buildSchedule(state.period);
+  const day = state.currentDay;
+  let cat = 'daily';
+  for (const s of schedule) {
+    if (day >= s.from && day <= s.to) { cat = s.cat; break; }
+  }
+  const pool = QUESTION_BANK[cat] || QUESTION_BANK.daily;
+  return pool[(day - 1) % pool.length];
+}
+
+// ── Attachment helpers ──
+function triggerAttach(ctx) {
+  document.getElementById(ctx+'-file-input').click();
+}
+
+async function handleFiles(e, ctx) {
+  const files = Array.from(e.target.files);
+  for (const file of files) {
+    if (file.size > 5 * 1024 * 1024) { showToast(file.name + ' — 5MB 이하만 첨부 가능해요'); continue; }
+    const b64 = await toBase64(file);
+    state.attachments[ctx].push({ name: file.name, type: file.type, data: b64 });
+    renderAttachPreview(ctx);
+  }
+  e.target.value = '';
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function renderAttachPreview(ctx) {
+  const area = document.getElementById(ctx+'-attach-preview');
+  if (!area) return;
+  area.innerHTML = '';
+  state.attachments[ctx].forEach((f, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'attach-thumb';
+    const isImage = f.type.startsWith('image/');
+    thumb.innerHTML = isImage
+      ? `<img src="data:${f.type};base64,${f.data}" alt="${f.name}">`
+      : `<span style="font-size:18px">📄</span>`;
+    thumb.innerHTML += `<span class="attach-thumb-name">${f.name}</span>
+      <button class="attach-thumb-remove" onclick="removeAttach('${ctx}',${i})">✕</button>`;
+    area.appendChild(thumb);
+  });
+}
+
+function removeAttach(ctx, idx) {
+  state.attachments[ctx].splice(idx, 1);
+  renderAttachPreview(ctx);
+}
+
+function buildContentWithAttachments(text, ctx) {
+  const files = state.attachments[ctx];
+  if (!files.length) return text;
+  const parts = [];
+  files.forEach(f => {
+    if (f.type.startsWith('image/')) {
+      parts.push({ type:'image', source:{ type:'base64', media_type:f.type, data:f.data } });
+    } else {
+      parts.push({ type:'text', text:`[첨부파일: ${f.name}]` });
+    }
+  });
+  if (text) parts.push({ type:'text', text });
+  return parts;
+}
+
+function clearAttachments(ctx) {
+  state.attachments[ctx] = [];
+  renderAttachPreview(ctx);
+}
+
+// ── Mobile keyboard fix ──
+function fixMobileKeyboard() {
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  input.addEventListener('focus', () => {
+    setTimeout(() => {
+      input.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      const msgs = document.getElementById('chat-messages');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    }, 400);
+  });
+}
+window.addEventListener('load', fixMobileKeyboard);
+
+// ── Intro landing → app transition ──
+function startApp() {
+  document.getElementById('s-intro').classList.remove('active');
+  document.getElementById('s-landing').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+const introObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.intro-reveal').forEach(el => introObserver.observe(el));
+
+// ── Navigation ──
+function goto(id) {
+  // 채팅 화면은 position:fixed라 별도 처리
+  const chatEl = document.getElementById('s-chat');
+
+  if (id === 's-chat') {
+    chatEl.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => requestAnimationFrame(() => chatEl.classList.add('visible')));
+    if (!state.sessionActive) initChat();
+  } else {
+    // 채팅 페이드아웃 후 닫기
+    chatEl.classList.remove('visible');
+    setTimeout(() => chatEl.classList.remove('active'), 300);
+    document.body.style.overflow = '';
+    // 일반 스크린 전환
+    document.querySelectorAll('.screen').forEach(s => {
+      if (s.id !== 's-chat') s.classList.remove('active');
+    });
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    if (id === 's-home') refreshHome();
+    if (id === 's-match') refreshMatchScreen();
+    window.scrollTo(0, 0);
+  }
+
+  const nav = document.getElementById('bottom-nav');
+  nav.classList.toggle('visible', ['s-home','s-chat','s-match'].includes(id));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const map = {'s-home':'nav-home','s-chat':'nav-chat','s-match':'nav-match'};
+  if (map[id]) document.getElementById(map[id]).classList.add('active');
+}
+
+// ── Onboarding helpers ──
+let currentStep = 0;
+function nextStep(n) {
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  document.getElementById('dot-'+currentStep).classList.replace('active','done');
+  currentStep = n;
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('dot-'+n).classList.add('active');
+}
+function selectChoice(btn, group) {
+  btn.closest('.choice-grid,.period-btns').querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state[group] = btn.textContent.trim();
+}
+function selectPeriod(btn, days) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected'); state.period = days;
+}
+function selectYeoulMode(btn, mode) {
+  document.querySelectorAll('.yeoul-mode-card').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.yeoulMode = mode;
+  document.getElementById('yeoul-mode-preview').textContent = YEOUL_MODES[mode].preview;
+}
+function selectMode(mode) {
+  state.chatMode = mode;
+  document.getElementById('mode-conv').classList.toggle('selected', mode==='conversation');
+  document.getElementById('mode-diary').classList.toggle('selected', mode==='diary');
+  const voiceBtn = document.getElementById('mode-voice');
+  if (voiceBtn) voiceBtn.classList.toggle('selected', mode==='voice');
+}
+
+// ── Voice style ──
+const VOICE_SETTINGS = {
+  calm:   { pitch:0.85, rate:0.88, name:'여울 (차분한)' },
+  warm:   { pitch:1.0,  rate:0.92, name:'여울 (따뜻한)' },
+  bright: { pitch:1.15, rate:1.0,  name:'여울 (밝은)' },
+  deep:   { pitch:0.7,  rate:0.85, name:'여울 (낮은)' }
+};
+
+function selectVoice(btn, style) {
+  document.querySelectorAll('.voice-card').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.voiceStyle = style;
+}
+
+function previewVoice() {
+  const samples = {
+    calm:   '안녕하세요. 오늘 하루 어떠셨나요?',
+    warm:   '안녕하세요! 오늘도 만나서 반가워요.',
+    bright: '안녕하세요~ 오늘 하루도 수고하셨어요!',
+    deep:   '안녕하세요. 편하게 이야기해주세요.'
+  };
+  speakText(samples[state.voiceStyle] || samples.calm);
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const vs = VOICE_SETTINGS[state.voiceStyle] || VOICE_SETTINGS.calm;
+  utter.lang = 'ko-KR';
+  utter.pitch = vs.pitch;
+  utter.rate = vs.rate;
+  utter.volume = 1;
+
+  // 한국어 목소리 찾기
+  const voices = window.speechSynthesis.getVoices();
+  const koVoice = voices.find(v => v.lang.startsWith('ko')) || voices[0];
+  if (koVoice) utter.voice = koVoice;
+
+  const si = document.getElementById('speaking-indicator');
+  const vs2 = document.getElementById('voice-status');
+  if (si) si.style.display = 'flex';
+  if (vs2) vs2.textContent = '여울이 말하는 중...';
+
+  utter.onend = () => {
+    if (si) si.style.display = 'none';
+    if (vs2) vs2.textContent = '탭해서 말하기';
+  };
+  window.speechSynthesis.speak(utter);
+}
+
+// ── STT (Speech Recognition) ──
+let recognition = null;
+let isListening = false;
+
+function initRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.lang = 'ko-KR';
+  r.continuous = false;
+  r.interimResults = true;
+
+  r.onstart = () => {
+    isListening = true;
+    const btn = document.getElementById('mic-btn');
+    const st = document.getElementById('voice-status');
+    if (btn) { btn.classList.add('listening'); btn.textContent = '⏹'; }
+    if (st) st.textContent = '듣고 있어요...';
+  };
+
+  r.onresult = (e) => {
+    const interim = Array.from(e.results).map(r => r[0].transcript).join('');
+    const interimEl = document.getElementById('voice-interim');
+    if (interimEl) interimEl.textContent = interim;
+    if (e.results[e.results.length - 1].isFinal) {
+      const final = e.results[e.results.length - 1][0].transcript.trim();
+      if (interimEl) interimEl.textContent = '';
+      if (final) handleVoiceInput(final);
+    }
+  };
+
+  r.onerror = (e) => {
+    stopListening();
+    const st = document.getElementById('voice-status');
+    if (st) st.textContent = e.error === 'not-allowed' ? '마이크 권한이 필요해요' : '다시 시도해주세요';
+  };
+
+  r.onend = () => stopListening();
+  return r;
+}
+
+function toggleMic() {
+  if (isListening) {
+    if (recognition) recognition.stop();
+    stopListening();
+    return;
+  }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  recognition = initRecognition();
+  if (!recognition) {
+    alert('이 브라우저는 음성 인식을 지원하지 않아요. Chrome을 사용해주세요.');
+    return;
+  }
+  try { recognition.start(); } catch(e) {}
+}
+
+function stopListening() {
+  isListening = false;
+  const btn = document.getElementById('mic-btn');
+  const st = document.getElementById('voice-status');
+  const interimEl = document.getElementById('voice-interim');
+  if (btn) { btn.classList.remove('listening'); btn.textContent = '🎙️'; }
+  if (st) st.textContent = '탭해서 말하기';
+  if (interimEl) interimEl.textContent = '';
+}
+
+async function handleVoiceInput(text) {
+  if (state.closingInProgress) return;
+  addMsg('user', text);
+
+  if (isExit(text)) {
+    state.closingInProgress = true;
+    await handleExit(text);
+    return;
+  }
+
+  const btn = document.getElementById('mic-btn');
+  if (btn) btn.classList.add('disabled');
+  showTyping();
+
+  try {
+    const modeConfig = YEOUL_MODES[state.yeoulMode] || YEOUL_MODES.lover;
+    const sys = modeConfig.system + `\n\n사용자: ${state.nick||'여행자'} (${state.purpose||''})\n\n음성 대화 중이에요. 답변을 짧고 자연스럽게 해주세요. 2~3문장.`;
+
+    const rawHistory = state.messages.map(m => ({
+      role: m.role==='ai' ? 'assistant' : 'user',
+      content: Array.isArray(m.content)
+        ? m.content.filter(c=>c.type==='text').map(c=>c.text).join(' ') || '(첨부파일)'
+        : (m.content || '')
+    })).filter(m => m.content.trim() !== '');
+
+    const history = [];
+    for (const msg of rawHistory) {
+      if (history.length === 0 || history[history.length-1].role !== msg.role) {
+        history.push(msg);
+      } else {
+        history[history.length-1].content += '\n' + msg.content;
+      }
+    }
+    if (history.length > 0 && history[0].role !== 'user') history.shift();
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, system:sys, messages:history })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || '잠시 연결이 끊겼어요.';
+    addMsg('ai', reply);
+    speakText(reply);
+  } catch {
+    const fb = ['그랬군요. 더 이야기해줄 수 있어요?', '그 순간 어떤 기분이었나요?', '오늘 하루 수고 많으셨어요.'];
+    const msg = fb[Math.floor(Math.random()*fb.length)];
+    addMsg('ai', msg);
+    speakText(msg);
+  }
+
+  if (btn) btn.classList.remove('disabled');
+}
+
+function switchToText() {
+  state.chatMode = 'conversation';
+  document.getElementById('voice-input-area').style.display = 'none';
+  document.getElementById('chat-input-area').style.display = 'block';
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (recognition) recognition.stop();
+}
+function selectExit(btn, kw) {
+  document.querySelectorAll('.exit-example').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('input-exit').value = kw;
+}
+function clearExitSel() {
+  document.querySelectorAll('.exit-example').forEach(b => b.classList.remove('selected'));
+}
+function startJourney() {
+  state.nick = document.getElementById('input-nick').value.trim() || '여행자';
+  const kw = document.getElementById('input-exit').value.trim();
+  if (kw) state.exitKeyword = kw;
+  refreshHome(); goto('s-home');
+}
+function demoMode() {
+  state.nick='봄날'; state.period=60; state.currentDay=3;
+  state.exitKeyword='오늘도 고생했어'; state.chatMode='conversation'; state.yeoulMode='lover';
+  state.history=[
+    {day:1,date:'5월 11일',preview:'오늘은 오랜만에 산책을 했어요. 별 이유 없이 걸었는데 머리가 맑아지더라고요...',mode:'💬 대화 모드'},
+    {day:2,date:'5월 12일',preview:'직장에서 작은 갈등이 있었어요. 내가 너무 예민한 건지 모르겠는데...',mode:'📖 일기 모드'}
+  ];
+  refreshHome(); goto('s-home');
+}
+
+// ── Home ──
+function refreshHome() {
+  document.getElementById('home-username').textContent = state.nick||'여행자';
+  const pct = Math.round((state.currentDay/state.period)*100);
+  document.getElementById('journey-fill').style.width = pct+'%';
+  document.getElementById('journey-day-label').textContent = 'Day '+state.currentDay;
+  document.getElementById('journey-total-label').textContent = state.period+'일 여정';
+  const idx = (state.currentDay-1)%PROMPTS.length;
+  document.getElementById('today-prompt').textContent = '"'+getTodayPrompt()+'"';
+  const titles=['저녁 노을처럼','하루의 끝에서','오늘을 되돌아보며','조용한 시간 속에서'];
+  document.getElementById('today-title').textContent = titles[new Date().getDate()%titles.length];
+  document.getElementById('today-mode-badge').textContent = (state.chatMode==='diary'?'📖 일기 모드':'💬 대화 모드') + ' · ' + (YEOUL_MODES[state.yeoulMode]?.label||'');
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  [...state.history].reverse().forEach(h=>{
+    const el = document.createElement('div');
+    el.className='history-item';
+    el.innerHTML=`<div class="history-day"><div class="history-day-num">${h.day}</div><div class="history-day-label">일차</div></div><div class="history-content"><div class="history-date">${h.date}</div><div class="history-preview">${h.preview}</div><div class="history-mode-tag">${h.mode||''}</div></div>`;
+    list.appendChild(el);
+  });
+}
+
+// ── Chat init ──
+function getTodayPrompt() {
+  const seed = state.currentDay * 7 + new Date().getDate() * 13;
+  return PROMPTS[seed % PROMPTS.length];
+}
+
+function initChat() {
+  state.sessionActive=true; state.closingInProgress=false; state.messages=[];
+  const todayPrompt = getTodayPrompt();
+  const nick = state.nick || '여행자';
+
+  document.getElementById('chat-day-badge').textContent='Day '+state.currentDay;
+  const modeLabel = state.chatMode==='diary'?'📖 일기':state.chatMode==='voice'?'🎙️ 음성':'💬 대화';
+  document.getElementById('strip-mode-label').textContent=modeLabel+' · '+(YEOUL_MODES[state.yeoulMode]?.label||'');
+  document.getElementById('strip-exit-kw').textContent=state.exitKeyword;
+  document.getElementById('chat-status').textContent='● 함께하고 있어요';
+
+  const exitBar = document.getElementById('strip-exit-bar');
+  if (exitBar) exitBar.style.display = state.chatMode==='diary' ? 'none' : 'flex';
+
+  // 자연스러운 오프닝 5가지 랜덤
+  const openings = [
+    `${nick}님, 오늘도 왔네요. 반가워요.\n\n${todayPrompt}`,
+    `어서 와요, ${nick}님. 오늘 하루 어땠는지 궁금했어요.\n\n${todayPrompt}`,
+    `${nick}님, 기다리고 있었어요.\n\n${todayPrompt}`,
+    `안녕하세요, ${nick}님. 오늘도 함께해서 좋아요.\n\n${todayPrompt}`,
+    `${nick}님, 오늘도 여기 와줘서 고마워요.\n\n${todayPrompt}`
+  ];
+  const opening = openings[(state.currentDay + new Date().getHours()) % openings.length];
+
+  // 모든 패널 초기화
+  document.getElementById('chat-messages').style.display='none';
+  document.getElementById('typing-wrap').style.display='none';
+  document.getElementById('chat-input-area').style.display='none';
+  document.getElementById('voice-input-area').style.display='none';
+  document.getElementById('diary-panel').classList.remove('active');
+
+  // 종료 관련 초기화
+  const tw = document.getElementById('typing-wrap');
+  if (tw) tw.style.display = 'none';
+  const esb = document.getElementById('end-suggest-bar');
+  if (esb) esb.style.display = 'none';
+  const endBtn = document.getElementById('end-btn');
+  if (endBtn) endBtn.disabled = false;
+
+  if (state.chatMode==='diary') {
+    document.getElementById('diary-panel').classList.add('active');
+    document.getElementById('diary-prompt-text').textContent=todayPrompt;
+    document.getElementById('diary-textarea').value='';
+    document.getElementById('diary-textarea').disabled=false;
+    document.getElementById('diary-ai-area').innerHTML='';
+    clearAttachments('diary');
+    updateWordCount();
+
+  } else if (state.chatMode==='voice') {
+    document.getElementById('chat-messages').style.display='flex';
+    document.getElementById('voice-input-area').style.display='flex';
+    const msgs=document.getElementById('chat-messages');
+    msgs.innerHTML=`<div class="chat-date-divider"><span>오늘 · Day ${state.currentDay}</span></div>`;
+    if (window.speechSynthesis) window.speechSynthesis.getVoices();
+    setTimeout(() => {
+      addMsg('ai', opening);
+      speakText(opening.replace(/\n\n/g,' '));
+    }, 600);
+
+  } else {
+    document.getElementById('chat-messages').style.display='flex';
+    document.getElementById('chat-input-area').style.display='block';
+    const msgs=document.getElementById('chat-messages');
+    msgs.innerHTML=`<div class="chat-date-divider"><span>오늘 · Day ${state.currentDay}</span></div>`;
+    document.getElementById('chat-input').disabled=false;
+    document.getElementById('send-btn').disabled=false;
+    setTimeout(()=>addMsg('ai', opening), 600);
+  }
+}
+
+// ── Conversation helpers ──
+function addMsg(role, text, attachFiles) {
+  const tw = document.getElementById('typing-wrap');
+  if (tw) tw.style.display = 'none';
+  const msgs = document.getElementById('chat-messages');
+  const now=new Date();
+  const t=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const d=document.createElement('div');
+  d.className='msg '+role;
+
+  let attachHTML = '';
+  if (attachFiles && attachFiles.length) {
+    attachHTML = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">';
+    attachFiles.forEach(f => {
+      if (f.type.startsWith('image/')) {
+        attachHTML += `<img src="data:${f.type};base64,${f.data}" style="max-width:180px;max-height:140px;object-fit:cover;border-radius:4px;">`;
+      } else {
+        attachHTML += `<div style="display:flex;align-items:center;gap:5px;background:var(--paper-dark);padding:5px 10px;font-size:11px;color:var(--ink-soft);border-radius:3px"><span>📄</span>${f.name}</div>`;
+      }
+    });
+    attachHTML += '</div>';
+  }
+
+  d.innerHTML=`<div class="msg-sender">${role==='ai'?'여울':(state.nick||'나')}</div>
+    <div class="msg-bubble">${attachHTML}${text.replace(/\n/g,'<br>')}</div>
+    <div class="msg-time">${t}</div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  const contentForHistory = (attachFiles && attachFiles.length)
+    ? buildContentWithAttachments(text, attachFiles)
+    : text;
+  state.messages.push({role, content: contentForHistory});
+}
+
+function buildContentWithAttachments(text, files) {
+  const parts = [];
+  files.forEach(f => {
+    if (f.type.startsWith('image/')) {
+      parts.push({ type:'image', source:{ type:'base64', media_type:f.type, data:f.data }});
+    } else {
+      parts.push({ type:'text', text:`[첨부파일: ${f.name}]` });
+    }
+  });
+  if (text) parts.push({ type:'text', text });
+  return parts;
+}
+
+function showTyping() {
+  const tw = document.getElementById('typing-wrap');
+  if (tw) tw.style.display = 'block';
+  const msgs = document.getElementById('chat-messages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── Exit keyword detection ──
+function isExit(text) {
+  return text.trim().toLowerCase().includes(state.exitKeyword.trim().toLowerCase());
+}
+
+// ── 종료 신호 pill 클릭 → 타이핑 애니메이션 후 자동 종료 ──
+async function triggerExitKeyword() {
+  if (state.closingInProgress) return;
+  document.getElementById('end-suggest-bar').style.display = 'none';
+
+  const keyword = state.exitKeyword;
+  const input = document.getElementById('chat-input');
+  const inputArea = document.getElementById('chat-input-area');
+  if (!input || !inputArea) {
+    // 입력창 없으면 바로 종료
+    state.closingInProgress = true;
+    disableChatInput();
+    await doEndSession();
+    return;
+  }
+
+  // 타이핑 애니메이션
+  input.disabled = false;
+  input.value = '';
+  input.focus();
+
+  let i = 0;
+  const typeInterval = setInterval(() => {
+    input.value += keyword[i];
+    i++;
+    // textarea 높이 조정
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    if (i >= keyword.length) {
+      clearInterval(typeInterval);
+      // 0.6초 후 자동 전송
+      setTimeout(async () => {
+        state.closingInProgress = true;
+        const text = input.value.trim();
+        input.value = '';
+        disableChatInput();
+        addMsg('user', text);
+        await doEndSession();
+      }, 600);
+    }
+  }, 80); // 글자당 80ms
+}
+
+// ── 종료 버튼 클릭 ──
+async function requestEndSession() {
+  if (state.closingInProgress) return;
+  await triggerExitKeyword();
+}
+
+// ── 여울 마무리 제안 거절 ──
+function dismissEndSuggest() {
+  document.getElementById('end-suggest-bar').style.display = 'none';
+  // 거절 후 여울이 자연스럽게 대화 이어감
+  addMsg('ai', '그럼 조금 더 이야기해요. 😊');
+}
+
+// ── 실제 종료 처리 ──
+async function doEndSession() {
+  showTyping();
+  const summary = state.messages
+    .filter(m => m.role === 'user')
+    .map(m => Array.isArray(m.content) ? m.content.filter(c=>c.type==='text').map(c=>c.text).join(' ') : m.content)
+    .join(' / ')
+    .slice(0, 500);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: `당신은 '여울'입니다. 오늘 나눈 대화를 바탕으로 따뜻하고 진심 어린 마무리 인사를 2~3문장으로 해주세요. 내일도 기다리고 있다는 느낌을 담아요. 자연스러운 대화체로, 목록이나 형식 없이.`,
+        messages: [{ role: 'user', content: `오늘 대화 요약: ${summary || '짧은 대화를 나눴어요.'}\n\n오늘 대화를 마무리하는 따뜻한 인사를 해주세요.` }]
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || `오늘도 함께해줘서 고마워요, ${state.nick || ''}님. 내일 또 만나요.`;
+    addMsg('ai', reply);
+    setTimeout(() => finishSession(reply), 1800);
+  } catch {
+    const msg = `오늘도 이렇게 이야기 나눠줘서 고마워요, ${state.nick || ''}님. 오늘 하루도 수고 많으셨어요. 내일도 기다릴게요.`;
+    addMsg('ai', msg);
+    setTimeout(() => finishSession(msg), 1800);
+  }
+}
+
+function disableChatInput() {
+  const input = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('send-btn');
+  const endBtn = document.getElementById('end-btn');
+  if (input) input.disabled = true;
+  if (sendBtn) sendBtn.disabled = true;
+  if (endBtn) endBtn.disabled = true;
+}
+
+// ── 5회 대화 후 여울이 마무리 제안 ──
+function checkAutoSuggestEnd() {
+  const userCount = state.messages.filter(m => m.role === 'user').length;
+  if (userCount === 5 && !state.closingInProgress) {
+    const bar = document.getElementById('end-suggest-bar');
+    if (bar) bar.style.display = 'block';
+  }
+}
+
+async function handleExit(userText) {
+  addMsg('user', userText);
+  disableChatInput();
+  await doEndSession();
+}
+
+async function sendMessage() {
+  if (state.closingInProgress) return;
+  const input=document.getElementById('chat-input');
+  const text=input.value.trim();
+  if (!text) return;
+  input.value=''; input.style.height='auto';
+  document.getElementById('send-btn').disabled=true;
+
+  if (isExit(text)) {
+    state.closingInProgress=true;
+    input.disabled=true;
+    await handleExit(text);
+    return;
+  }
+
+  addMsg('user', text, state.attachments.conv);
+  clearAttachments('conv');
+  showTyping();
+  try {
+    const modeConfig = YEOUL_MODES[state.yeoulMode] || YEOUL_MODES.lover;
+    const sys = modeConfig.system + `\n\n사용자 정보: 닉네임 ${state.nick||'여행자'}, 목적 ${state.purpose||''}`;
+
+    // content가 배열이면 텍스트만 추출, role 순서 보장
+    const rawHistory = state.messages.map(m => ({
+      role: m.role==='ai' ? 'assistant' : 'user',
+      content: Array.isArray(m.content)
+        ? m.content.filter(c=>c.type==='text').map(c=>c.text).join(' ') || '(첨부파일)'
+        : (m.content || '')
+    })).filter(m => m.content.trim() !== '');
+
+    // user/assistant 교대 순서 보장 — 연속 같은 role 제거
+    const history = [];
+    for (const msg of rawHistory) {
+      if (history.length === 0 || history[history.length-1].role !== msg.role) {
+        history.push(msg);
+      } else {
+        // 같은 role 연속이면 마지막 것에 합치기
+        history[history.length-1].content += '\n' + msg.content;
+      }
+    }
+    // 반드시 user로 시작해야 함
+    if (history.length > 0 && history[0].role !== 'user') {
+      history.shift();
+    }
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:sys,messages:history})});
+    const data=await res.json();
+    addMsg('ai',data.content?.[0]?.text||'잠시 연결이 끊겼어요.');
+  } catch(e) {
+    console.error(e);
+    const fb=["그랬군요. 그 순간 어떤 감정이 가장 먼저 올라왔나요?","말씀하시면서 어떤 느낌이 드세요?","그 경험에서 가장 소중하게 여기는 것이 느껴지나요?","그 생각이 하루 내내 따라다녔군요. 왜 마음에 걸린다고 생각하세요?","당신이 정말 원하는 게 무엇인지 조금 더 선명해지는 것 같아요."];
+    addMsg('ai',fb[Math.floor(Math.random()*fb.length)]);
+  }
+  document.getElementById('send-btn').disabled=false;
+  checkAutoSuggestEnd();
+}
+
+function handleKey(e) {
+  if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+  const ta=document.getElementById('chat-input');
+  ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,120)+'px';
+}
+
+// ── Diary mode ──
+function updateWordCount() {
+  document.getElementById('word-count').textContent=document.getElementById('diary-textarea').value.length+'자';
+}
+
+async function submitDiary() {
+  const text=document.getElementById('diary-textarea').value.trim();
+  const hasAttach = state.attachments.diary.length > 0;
+  if (text.length < 10 && !hasAttach) { showToast('조금 더 써주세요 (10자 이상)'); return; }
+
+  const diaryAttach = [...state.attachments.diary];
+  clearAttachments('diary');
+
+  const contentForHistory = (diaryAttach.length)
+    ? buildContentWithAttachments(text, diaryAttach)
+    : text;
+  state.messages.push({role:'user', content: contentForHistory});
+
+  const area=document.getElementById('diary-ai-area');
+  const submitBtn = document.querySelector('.diary-submit-row .btn-primary');
+  if (submitBtn) submitBtn.disabled = true;
+
+  area.innerHTML='<div style="font-size:13px;color:var(--ink-muted);padding:12px 0;font-style:italic">여울이 읽고 있어요...</div>';
+
+  const diarySystem = `당신은 '여울'이라는 AI 파트너입니다. 사용자가 오늘의 일기를 써줬어요.
+
+역할: 일기를 읽은 뒤 따뜻한 답장 편지를 써주는 것. 질문하지 않아요.
+
+답장 원칙:
+- 인정: 사용자가 겪은 일, 느낀 감정을 그대로 인정해줘요. "그랬군요. 그 마음이 느껴져요."
+- 지지: 사용자의 선택과 존재 자체를 지지해줘요. 잘 잘못 평가 없이.
+- 긍정: 오늘 하루에서 작은 빛을 찾아 비춰줘요. 억지 위로 아닌 진심 어린 따뜻함.
+- 절대 금지: 질문, 조언, 해결책, 평가, 지시 ("~해보세요" 금지)
+- 길이: 3~5문장. 편지처럼 자연스럽게.
+- 마무리: 오늘 써줘서 고맙다는 말 + 내일도 기다린다는 말로 끝내기.`;
+
+  try {
+    const userContent = diaryAttach.length
+      ? [...diaryAttach.filter(f=>f.type.startsWith('image/')).map(f=>({type:'image',source:{type:'base64',media_type:f.type,data:f.data}})),
+         {type:'text', text:`오늘의 질문: "${getTodayPrompt()}"\n\n${state.nick||''}님의 일기:\n\n${text}${diaryAttach.filter(f=>!f.type.startsWith('image/')).map(f=>`\n[첨부파일: ${f.name}]`).join('')}`}]
+      : `오늘의 질문: "${getTodayPrompt()}"\n\n${state.nick||''}님의 일기:\n\n${text}`;
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:500,
+      system:diarySystem,
+      messages:[{role:'user',content:userContent}]
+    })});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'오늘 하루를 솔직하게 써줘서 고마워요. 쉽지 않은 하루였을 텐데, 그럼에도 이렇게 써내려간 당신이 대단해요. 내일도 기다릴게요.';
+    state.messages.push({role:'ai',content:reply});
+    area.innerHTML=`<div class="diary-ai-response"><div class="diary-ai-label">여울의 답장</div><div class="diary-ai-text">${reply.replace(/\n/g,'<br>')}</div></div>`;
+  } catch {
+    const fallbacks = [
+      '오늘 이렇게 써줘서 고마워요. 많은 것들이 한꺼번에 밀려온 하루였던 것 같아요. 그 무게를 혼자 다 감당하면서도 여기까지 왔네요. 내일도 기다릴게요.',
+      '오늘 느낀 것들을 솔직하게 털어놔줘서 고마워요. 그 감정들은 모두 당연한 거예요. 당신이 느끼는 것은 언제나 틀리지 않아요. 내일 또 만나요.',
+      '읽으면서 많은 게 느껴졌어요. 오늘 하루 정말 수고했어요. 이 글을 쓴 것만으로도 충분히 잘 해낸 거예요. 내일도 여기 있을게요.'
+    ];
+    const reply = fallbacks[Math.floor(Math.random()*fallbacks.length)];
+    state.messages.push({role:'ai',content:reply});
+    area.innerHTML=`<div class="diary-ai-response"><div class="diary-ai-label">여울의 답장</div><div class="diary-ai-text">${reply}</div></div>`;
+  }
+
+  if (submitBtn) submitBtn.disabled = false;
+
+  const endRow = document.querySelector('.diary-submit-row');
+  if (endRow) {
+    const finishBtn = document.createElement('button');
+    finishBtn.className = 'btn-primary';
+    finishBtn.style.cssText = 'width:100%;margin-top:12px;font-size:13px;padding:14px';
+    finishBtn.textContent = '오늘 마무리하기 ✦';
+    finishBtn.onclick = () => {
+      const msg = state.messages.findLast?.(m=>m.role==='ai')?.content || '오늘도 함께해줘서 고마워요.';
+      finishSession(msg);
+    };
+    endRow.innerHTML = '';
+    endRow.appendChild(finishBtn);
+  }
+}
+
+// ── Session finish ──
+function finishSession(closingMsg) {
+  const firstUser=state.messages.find(m=>m.role==='user');
+  const preview=firstUser?firstUser.content.slice(0,50)+'...':'';
+  const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const now=new Date();
+  state.history.push({day:state.currentDay,date:`${months[now.getMonth()]} ${now.getDate()}일`,preview,mode:(state.chatMode==='diary'?'📖 일기':'💬 대화')+' · '+(YEOUL_MODES[state.yeoulMode]?.label||'')});
+  state.currentDay++; state.sessionActive=false; state.closingInProgress=false;
+  document.getElementById('closing-msg').textContent=closingMsg.slice(0,90);
+  const ov=document.getElementById('closing-overlay');
+  ov.classList.add('show');
+  setTimeout(()=>{ov.classList.remove('show'); goto('s-home');},3000);
+}
+
+// ── Session finish ──
+async function finishSession(closingMsg) {
+  const firstUser = state.messages.find(m => m.role==='user');
+  const preview = firstUser
+    ? (typeof firstUser.content === 'string' ? firstUser.content : firstUser.content[0]?.text || '').slice(0,50)+'...'
+    : '';
+  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const now = new Date();
+
+  state.history.push({
+    day: state.currentDay,
+    date: `${months[now.getMonth()]} ${now.getDate()}일`,
+    preview,
+    mode: (state.chatMode==='diary'?'📖 일기':'💬 대화')+' · '+(YEOUL_MODES[state.yeoulMode]?.label||''),
+    messages: [...state.messages]
+  });
+
+  // 종료 화면 표시
+  document.getElementById('closing-step-1').style.display = 'flex';
+  document.getElementById('closing-step-2').style.display = 'none';
+  document.getElementById('closing-msg').textContent = '여울이 오늘을 돌아보고 있어요...';
+  const ov = document.getElementById('closing-overlay');
+  ov.classList.add('show');
+
+  // AI로 맞춤형 마무리 한마디 생성
+  const convo = state.messages
+    .filter(m => m.role === 'user')
+    .map(m => typeof m.content === 'string' ? m.content : m.content.filter(c=>c.type==='text').map(c=>c.text).join(' '))
+    .join(' / ')
+    .slice(0, 500);
+
+  let personalMsg = closingMsg;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 120,
+        system: `당신은 '여울'입니다. 오늘 나눈 대화를 바탕으로 사용자에게 진심 어린 마무리 한마디를 해주세요.
+
+형식: "오늘도 함께해줘서 고마워요, ${state.nick || ''}님. [오늘 대화에서 느낀 것 한 문장]. [따뜻한 응원이나 위로 한 문장]."
+
+규칙:
+- 반드시 사용자 닉네임 포함
+- 오늘 실제로 나눈 대화 내용을 구체적으로 반영 (일반적인 말 금지)
+- 2~3문장, 자연스러운 대화체
+- 따뜻하되 억지스럽지 않게`,
+        messages: [{ role: 'user', content: `오늘 대화 내용: ${convo || '짧은 대화를 나눴어요.'}\n\n마무리 한마디를 해주세요.` }]
+      })
+    });
+    const data = await res.json();
+    personalMsg = data.content?.[0]?.text || closingMsg;
+  } catch {
+    personalMsg = `오늘도 함께해줘서 고마워요, ${state.nick || ''}님. 오늘 하루도 잘 버텨내셨어요. 내일도 여기서 기다릴게요.`;
+  }
+
+  // 1단계: 개인화 메시지 표시
+  document.getElementById('closing-msg').textContent = personalMsg;
+
+  // 2단계: 2.5초 후 요약 카드로 전환
+  setTimeout(async () => {
+    document.getElementById('closing-step-1').style.display = 'none';
+    document.getElementById('closing-step-2').style.display = 'block';
+
+    const pct = Math.round((state.currentDay / state.period) * 100);
+    document.getElementById('closing-progress-fill').style.width = pct + '%';
+    document.getElementById('closing-day-label').textContent = 'Day ' + state.currentDay + ' 완료';
+    document.getElementById('closing-period-label').textContent = state.period + '일 여정';
+
+    await extractClosingKeywords();
+
+    state.currentDay++;
+    state.sessionActive = false;
+    state.closingInProgress = false;
+  }, 2500);
+}
+
+async function extractClosingKeywords() {
+  const kwEl = document.getElementById('closing-keywords');
+  try {
+    const convo = state.messages
+      .filter(m => m.role === 'user')
+      .map(m => typeof m.content === 'string' ? m.content : m.content.filter(c=>c.type==='text').map(c=>c.text).join(' '))
+      .join(' / ')
+      .slice(0, 400);
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        system: '대화에서 오늘의 감정/키워드를 2~3개 추출해요. JSON으로만 응답: {"keywords":["키워드1","키워드2"]}',
+        messages: [{ role: 'user', content: `오늘 대화: ${convo}\n\n감정 키워드 2~3개를 JSON으로.` }]
+      })
+    });
+    const data = await res.json();
+    const parsed = JSON.parse((data.content?.[0]?.text || '{}').replace(/```json|```/g,'').trim());
+    const keywords = parsed.keywords || ['오늘의 대화'];
+    kwEl.innerHTML = keywords.map(k =>
+      `<span style="padding:5px 16px;border:1px solid var(--accent-light);color:var(--paper);font-size:13px;border-radius:20px">${k}</span>`
+    ).join('');
+  } catch {
+    kwEl.innerHTML = `<span style="padding:5px 16px;border:1px solid var(--accent-light);color:var(--paper);font-size:13px;border-radius:20px">오늘의 대화 ✦</span>`;
+  }
+}
+
+function closeClosingScreen() {
+  const ov = document.getElementById('closing-overlay');
+  ov.style.opacity = '0';
+  ov.style.transition = 'opacity 0.4s';
+  setTimeout(() => {
+    ov.classList.remove('show');
+    ov.style.opacity = '';
+    ov.style.transition = '';
+    goto('s-home');
+  }, 400);
+}
+
+function viewTodayChat() {
+  const modal = document.getElementById('today-chat-modal');
+  const content = document.getElementById('today-chat-content');
+  // 마지막 히스토리의 messages 사용
+  const lastHistory = state.history[state.history.length - 1];
+  const msgs = lastHistory?.messages || state.messages;
+  if (!msgs || msgs.length === 0) {
+    content.innerHTML = '<div style="font-size:13px;color:var(--ink-muted);padding:12px 0">대화 내용이 없어요.</div>';
+  } else {
+    content.innerHTML = msgs.map(m => {
+      const text = typeof m.content === 'string' ? m.content : m.content.filter(c=>c.type==='text').map(c=>c.text).join(' ');
+      const isAi = m.role === 'ai';
+      return `<div style="margin-bottom:14px;${isAi?'':'text-align:right'}">
+        <div style="font-size:10px;color:var(--ink-muted);letter-spacing:1px;margin-bottom:4px">${isAi?'여울':(state.nick||'나')}</div>
+        <div style="display:inline-block;padding:10px 14px;font-size:13px;line-height:1.7;border:1px solid var(--line);max-width:85%;${isAi?'background:var(--paper-warm);border-radius:0 10px 10px 10px;font-family:Noto Serif KR,serif':'background:var(--ink);color:var(--paper);border-radius:10px 0 10px 10px;border-color:transparent'}">${text.replace(/\n/g,'<br>')}</div>
+      </div>`;
+    }).join('');
+  }
+  modal.classList.add('open');
+}
+
+function closeTodayChatModal(e) {
+  if (e.target === document.getElementById('today-chat-modal'))
+    document.getElementById('today-chat-modal').classList.remove('open');
+}
+
+// ── 리마인더 ──
+let selectedReminderTime = '';
+function setReminderFromClosing() {
+  document.getElementById('reminder-modal').classList.add('open');
+}
+function selectReminderTime(btn, time) {
+  document.querySelectorAll('.reminder-time-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedReminderTime = time;
+}
+function saveReminder() {
+  if (!selectedReminderTime) { showToast('시간을 선택해주세요'); return; }
+  state.reminderTime = selectedReminderTime;
+  document.getElementById('reminder-modal').classList.remove('open');
+  const btn = document.getElementById('closing-reminder-btn');
+  if (btn) btn.textContent = `🔔 내일 ${selectedReminderTime} 알림 설정됨`;
+  showToast(`내일 ${selectedReminderTime}에 여울이 기다릴게요 ✦`);
+}
+function closeReminderModal(e) {
+  if (e.target === document.getElementById('reminder-modal'))
+    document.getElementById('reminder-modal').classList.remove('open');
+}
+
+function endSessionManual() {
+  const hasContent = state.messages.filter(m=>m.role==='user').length>0 ||
+    document.getElementById('diary-textarea')?.value.trim().length>0;
+  if (!hasContent){showToast('아직 이야기를 나누지 않으셨어요');return;}
+  finishSession('오늘도 함께해줘서 고마워요.');
+}
+
+// ── Report ──
+async function openReport() {
+  document.getElementById('report-modal').classList.add('open');
+  if (state.messages.length<2){
+    document.getElementById('report-personality').textContent='대화를 더 나눈 뒤에 분석이 완성돼요.';
+    document.getElementById('report-summary').textContent='아직 여정을 시작하지 않으셨네요.';
+    return;
+  }
+  document.getElementById('report-personality').textContent='분석 중...';
+  document.getElementById('report-summary').textContent='분석 중...';
+  try {
+    const convo=state.messages.map(m=>`${m.role==='ai'?'여울':state.nick}: ${m.content}`).join('\n');
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:'대화 분석가. 순수 JSON만 응답.',messages:[{role:'user',content:`분석:\n\n${convo}\n\nJSON 형식: {"personality":"2~3문장 성향 분석","summary":"따뜻한 한마디 2문장"}`}]})});
+    const data=await res.json();
+    const parsed=JSON.parse((data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim());
+    document.getElementById('report-personality').textContent=parsed.personality||'분석 완료';
+    document.getElementById('report-summary').textContent=parsed.summary||'';
+  } catch {
+    document.getElementById('report-personality').textContent='조용하고 사려 깊은 방식으로 이야기를 나누는 분이에요.';
+    document.getElementById('report-summary').textContent='당신과 함께한 시간이 소중했어요. 당신이 원하는 것이 조금씩 선명해지고 있는 것 같아요.';
+  }
+}
+function closeReport(e){if(e.target===document.getElementById('report-modal'))closeReportBtn();}
+function closeReportBtn(){document.getElementById('report-modal').classList.remove('open');}
+
+// ── Match ──
+function refreshMatchScreen() {
+  const done = state.currentDay - 1;
+  const total = state.period;
+  const left = Math.max(0, total - done);
+  const pct = Math.min(100, Math.round((done / total) * 100));
+  const isComplete = done >= total;
+
+  // 진행 바 업데이트
+  document.getElementById('match-day-label').textContent = 'Day ' + done;
+  document.getElementById('match-period-label').textContent = total + '일 여정';
+  document.getElementById('match-days-left').textContent = left;
+  document.getElementById('match-days-done').textContent = done;
+  setTimeout(() => {
+    document.getElementById('match-progress-fill').style.width = pct + '%';
+  }, 300);
+
+  // 완주 여부에 따라 화면 전환
+  if (isComplete) {
+    document.getElementById('match-locked').style.display = 'none';
+    document.getElementById('match-unlocked').style.display = 'block';
+    document.getElementById('home-match-btn').textContent = '✦ 매칭 열림';
+    document.getElementById('home-match-btn').style.color = 'var(--accent)';
+    document.getElementById('home-match-btn').style.borderColor = 'var(--accent)';
+  } else {
+    document.getElementById('match-locked').style.display = 'block';
+    document.getElementById('match-unlocked').style.display = 'none';
+    document.getElementById('home-match-btn').textContent = `🔒 매칭 잠금 중 (${pct}%)`;
+  }
+}
+
+function passMatch(){showToast('조용히 패스했어요');setTimeout(()=>goto('s-home'),1000);}
+function connectMatch(){document.getElementById('match-card-1').style.borderColor='var(--gold)';showToast('✦ 연결 신청을 보냈어요. 상대방의 응답을 기다려요.');setTimeout(()=>goto('s-home'),2000);}
+
+// ── Toast ──
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+</script>
+</body>
+</html>
